@@ -147,3 +147,56 @@ background:#F7FBFF;
 #search{
 margin-top:12px;
 }
+/* ===== THỐNG KÊ ===== */
+
+.stats{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-bottom:14px;
+}
+
+.statbox{
+background:white;
+padding:12px;
+border-radius:16px;
+}
+
+.label{
+font-size:13px;
+color:#64748B;
+}
+
+.money{
+font-size:22px;
+font-weight:bold;
+color:#2563EB;
+margin-top:6px;
+}
+
+.currency{
+font-size:12px;
+color:#94A3B8;
+}
+
+/* ===== VUỐT XÓA ===== */
+
+tr{
+position:relative;
+transition:transform .2s;
+background:white;
+}
+
+.delete-bg{
+position:absolute;
+right:0;
+top:0;
+bottom:0;
+width:90px;
+background:#EF4444;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-weight:bold;
+}
