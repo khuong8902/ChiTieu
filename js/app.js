@@ -1,260 +1,228 @@
-// ===== Chi Tieu V1.1 =====
+document.addEventListener("DOMContentLoaded", () => {
 
-const $ = id => document.getElementById(id)
+const $ = id => document.getElementById(id);
 
-const today = () => new Date().toISOString().slice(0,10)
+const today = () => new Date().toISOString().slice(0,10);
 
-//------------------ DATABASE ------------------
+const splash = $("splash");
+const app = $("app");
+
+const name = $("name");
+const price = $("price");
+const weight = $("weight");
+const currency = $("currency");
+const unit = $("unit");
+const date = $("date");
+
+const search = $("search");
+const rows = $("rows");
+const suggestions = $("suggestions");
 
 let names = JSON.parse(localStorage.getItem("names") ||
-'["Cá hồi","Cà chua","Cam","Chuối","Gạo","Sữa","Trứng","Thịt heo"]')
+'["Cá hồi","Cà chua","Cam","Chuối","Gạo","Sữa","Trứng","Thịt heo"]');
 
-let data = JSON.parse(localStorage.getItem("expenses") || "[]")
+let data = JSON.parse(localStorage.getItem("expenses") || "[]");
 
-$("date").value = today()
+date.value = today();
 
-$("currency").value =
-localStorage.getItem("lastCurrency") || "VND"
-
-$("unit").value =
-localStorage.getItem("lastUnit") || "g"
+currency.value = localStorage.getItem("lastCurrency") || "VND";
+unit.value = localStorage.getItem("lastUnit") || "g";
 
 function saveDB(){
 
-    localStorage.setItem("names",JSON.stringify(names))
-    localStorage.setItem("expenses",JSON.stringify(data))
+  localStorage.setItem("names",JSON.stringify(names));
+  localStorage.setItem("expenses",JSON.stringify(data));
+  localStorage.setItem("lastCurrency",currency.value);
+  localStorage.setItem("lastUnit",unit.value);
 
-    localStorage.setItem(
-      "lastCurrency",
-      $("currency").value
-    )
-
-    localStorage.setItem(
-      "lastUnit",
-      $("unit").value
-    )
 }
-
-//------------------ NORMALIZE ------------------
 
 function normalize(str){
 
-    return str
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g,"")
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"");
 
 }
-
-//------------------ SUGGEST ------------------
 
 function renderSuggestions(){
 
-    const q = normalize($("name").value)
+  const q = normalize(name.value);
 
-    const box = $("suggestions")
+  suggestions.innerHTML="";
 
-    box.innerHTML = ""
+  if(q===""){
+    suggestions.style.display="none";
+    return;
+  }
 
-    if(q===""){
-        box.style.display="none"
-        return
+  const list = names.filter(i=>normalize(i).includes(q));
+
+  list.forEach(v=>{
+
+    const div=document.createElement("div");
+
+    div.className="item";
+
+    div.textContent=v;
+
+    div.onclick=()=>{
+
+      name.value=v;
+
+      suggestions.style.display="none";
+
     }
 
-    const list = names.filter(item =>
-        normalize(item).includes(q)
-    )
+    suggestions.appendChild(div);
 
-    list.forEach(v=>{
+  });
 
-        const div=document.createElement("div")
-
-        div.className="item"
-
-        div.textContent=v
-
-        div.onclick=()=>{
-
-            $("name").value=v
-
-            box.style.display="none"
-
-        }
-
-        box.appendChild(div)
-
-    })
-
-    box.style.display=list.length?"block":"none"
+  suggestions.style.display=list.length ? "block":"none";
 
 }
-
-$("name").addEventListener(
-"input",
-renderSuggestions
-)
-
-//------------------ TABLE ------------------
 
 function renderTable(){
 
-    const q = normalize($("search").value)
+  const q = normalize(search.value);
 
-    $("rows").innerHTML=""
+  rows.innerHTML="";
 
-    data
+  data
     .filter(i=>normalize(i.name).includes(q))
     .forEach(i=>{
 
-        $("rows").innerHTML+=`
-        <tr>
-            <td>${i.date}</td>
-            <td>${i.name}</td>
-            <td>${Number(i.price).toLocaleString()} ${i.currency}</td>
-        </tr>`
+      rows.innerHTML += `
+      <tr>
+        <td>${i.date}</td>
+        <td>${i.name}</td>
+        <td>${Number(i.price).toLocaleString()} ${i.currency}</td>
+      </tr>`;
 
-    })
+    });
 
 }
 
-$("search").addEventListener(
-"input",
-renderTable
-)
+name.addEventListener("input",renderSuggestions);
 
-//------------------ HIDE SUGGEST ------------------
+search.addEventListener("input",renderTable);
 
 document.addEventListener("click",e=>{
 
-    if(!e.target.closest(".field"))
-        $("suggestions").style.display="none"
+  if(!e.target.closest(".field"))
+      suggestions.style.display="none";
 
-})
-
-//------------------ SAVE ------------------
+});
 
 $("save").onclick=()=>{
 
-    const n=$("name").value.trim()
+  const n=name.value.trim();
 
-    if(n==="") return
+  if(n==="") return;
 
-    if(!names.includes(n)){
+  if(!names.includes(n)){
 
-        names.push(n)
+    names.push(n);
 
-        names.sort()
+    names.sort();
 
-    }
+  }
 
-    data.unshift({
+  data.unshift({
 
-        date:$("date").value,
+    date:date.value,
 
-        name:n,
+    name:n,
 
-        price:$("price").value || 0,
+    price:price.value || 0,
 
-        currency:$("currency").value,
+    currency:currency.value,
 
-        weight:$("weight").value || 0,
+    weight:weight.value || 0,
 
-        unit:$("unit").value
+    unit:unit.value
 
-    })
+  });
 
-    saveDB()
+  saveDB();
 
-    $("name").value=""
+  name.value="";
+  price.value="";
+  weight.value="";
+  date.value=today();
 
-    $("price").value=""
+  renderTable();
 
-    $("weight").value=""
+  suggestions.style.display="none";
 
-    $("date").value=today()
-
-    renderTable()
-
-    $("suggestions").style.display="none"
-
-}
-
-//------------------ IMPORT TXT ------------------
+};
 
 $("txt").onchange=async e=>{
 
-    const f=e.target.files[0]
+  const f=e.target.files[0];
 
-    if(!f) return
+  if(!f) return;
 
-    const txt=await f.text()
+  const text=await f.text();
 
-    txt.split(/\r?\n/)
-    .map(s=>s.trim())
-    .filter(Boolean)
-    .forEach(v=>{
+  text.split(/\r?\n/)
+      .map(s=>s.trim())
+      .filter(Boolean)
+      .forEach(v=>{
 
         if(!names.includes(v))
-            names.push(v)
+            names.push(v);
 
-    })
+      });
 
-    names.sort()
+  names.sort();
 
-    saveDB()
+  saveDB();
 
-    alert("Đã cập nhật NameList!")
+  alert("Đã cập nhật NameList!");
 
-}
-
-//------------------ EXPORT CSV ------------------
+};
 
 $("excel").onclick=()=>{
 
-    const rows=[
+  const table=[["Ngày nhập","Tên sản phẩm","Giá","Trọng lượng"]];
 
-        ["Ngày nhập","Tên sản phẩm","Giá","Trọng lượng"]
+  data.forEach(i=>{
 
-    ]
+    table.push([
+      i.date,
+      i.name,
+      `${i.price} ${i.currency}`,
+      `${i.weight} ${i.unit}`
+    ]);
 
-    data.forEach(i=>{
+  });
 
-        rows.push([
+  const csv=table.map(r=>r.join(",")).join("\n");
 
-            i.date,
+  const blob=new Blob(["\ufeff"+csv],{
+      type:"text/csv;charset=utf-8;"
+  });
 
-            i.name,
+  const a=document.createElement("a");
 
-            `${i.price} ${i.currency}`,
+  a.href=URL.createObjectURL(blob);
 
-            `${i.weight} ${i.unit}`
+  a.download="DuLieuChiTieu.csv";
 
-        ])
+  a.click();
 
-    })
+};
 
-    const csv=rows
-      .map(r=>r.join(","))
-      .join("\n")
+renderTable();
 
-    const blob=new Blob(
+setTimeout(()=>{
 
-      ["\ufeff"+csv],
+  splash.style.display="none";
 
-      {type:"text/csv;charset=utf-8;"}
+  app.classList.remove("hidden");
 
-    )
+},700);
 
-    const a=document.createElement("a")
-
-    a.href=URL.createObjectURL(blob)
-
-    a.download="DuLieuChiTieu.csv"
-
-    a.click()
-
-}
-
-//------------------
-
-renderTable()
+});
