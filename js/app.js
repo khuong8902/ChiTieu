@@ -1,5 +1,28 @@
-document.addEventListener("DOMContentLoaded", () => {
+async function syncNameList(){
 
+  try{
+
+    const res = await fetch("NameList.txt");
+
+    const txt = await res.text();
+
+    const fileNames = txt
+      .split(/\r?\n/)
+      .map(i=>i.trim())
+      .filter(Boolean);
+
+    names = [...new Set([...names,...fileNames])].sort();
+
+    saveDB();
+
+  }catch(e){
+    console.log("Không đọc được NameList");
+  }
+
+}
+document.addEventListener("DOMContentLoaded", () => {
+await syncNameList();
+renderTable();
 const $ = id => document.getElementById(id);
 
 const today = () => new Date().toISOString().slice(0,10);
