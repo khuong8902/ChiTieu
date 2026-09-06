@@ -1,1 +1,9 @@
-{"name":"Chi Tiêu"}
+
+{
+  "name":"Chi Tiêu",
+  "short_name":"ChiTieu",
+  "display":"standalone",
+  "start_url":"./",
+  "background_color":"#EAF7FF",
+  "theme_color":"#2563EB"
+}
