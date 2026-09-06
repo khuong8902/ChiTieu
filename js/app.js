@@ -2,7 +2,6 @@
 document.addEventListener("DOMContentLoaded",()=>{
 
 const $=id=>document.getElementById(id);
-
 const today=()=>new Date().toISOString().slice(0,10);
 
 const splash=$("splash");
@@ -17,6 +16,9 @@ const date=$("date");
 const search=$("search");
 const rows=$("rows");
 const suggestions=$("suggestions");
+const saveBtn=$("save");
+
+let editIndex=-1;
 
 let names=JSON.parse(
 localStorage.getItem("names")||
@@ -35,9 +37,7 @@ localStorage.getItem("lastCurrency")||"VND";
 function saveDB(){
 
 localStorage.setItem("names",JSON.stringify(names));
-
 localStorage.setItem("expenses",JSON.stringify(data));
-
 localStorage.setItem("lastCurrency",currency.value);
 
 }
@@ -68,11 +68,7 @@ names=[...new Set([...names,...fileNames])].sort();
 
 saveDB();
 
-}catch(e){
-
-console.log("NameList không đọc được");
-
-}
+}catch(e){}
 
 }
 
@@ -83,11 +79,8 @@ const q=normalize(name.value);
 suggestions.innerHTML="";
 
 if(q===""){
-
 suggestions.style.display="none";
-
 return;
-
 }
 
 const list=names.filter(i=>
@@ -97,15 +90,12 @@ normalize(i).includes(q)
 list.forEach(v=>{
 
 const div=document.createElement("div");
-
 div.className="item";
-
 div.textContent=v;
 
 div.onclick=()=>{
 
 name.value=v;
-
 suggestions.style.display="none";
 
 };
@@ -114,8 +104,7 @@ suggestions.appendChild(div);
 
 });
 
-suggestions.style.display=
-list.length?"block":"none";
+suggestions.style.display=list.length?"block":"none";
 
 }
 
@@ -127,16 +116,56 @@ rows.innerHTML="";
 
 data
 .filter(i=>normalize(i.name).includes(q))
-.forEach(i=>{
+.forEach(item=>{
 
-rows.innerHTML+=`
-<tr>
-<td>${i.date}</td>
-<td>${i.name}</td>
-<td>${Number(i.price).toLocaleString()} ${i.currency}</td>
-</tr>`;
+const index=data.indexOf(item);
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+<td>${item.date}</td>
+<td>${item.name}</td>
+<td>${Number(item.price).toLocaleString()} ${item.currency}</td>`;
+
+tr.onclick=()=>loadForEdit(index);
+
+rows.appendChild(tr);
 
 });
+
+}
+
+function loadForEdit(index){
+
+const item=data[index];
+
+editIndex=index;
+
+name.value=item.name;
+price.value=item.price;
+weight.value=item.weight;
+currency.value=item.currency;
+date.value=item.date;
+
+saveBtn.textContent="CẬP NHẬT";
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+function clearForm(){
+
+name.value="";
+price.value="";
+weight.value="";
+date.value=today();
+
+editIndex=-1;
+
+saveBtn.textContent="ENTER";
 
 }
 
@@ -147,48 +176,44 @@ search.addEventListener("input",renderTable);
 document.addEventListener("click",e=>{
 
 if(!e.target.closest(".field"))
-
 suggestions.style.display="none";
 
 });
 
-$("save").onclick=()=>{
+saveBtn.onclick=()=>{
 
-const n=name.value.trim();
+const obj={
 
-if(n==="") return;
+date:date.value,
+name:name.value.trim(),
+price:price.value||0,
+weight:weight.value||0,
+currency:currency.value
 
-if(!names.includes(n)){
+};
 
-names.push(n);
+if(obj.name==="") return;
 
+if(editIndex==-1){
+
+data.unshift(obj);
+
+if(!names.includes(obj.name)){
+
+names.push(obj.name);
 names.sort();
 
 }
 
-data.unshift({
+}else{
 
-date:date.value,
+data[editIndex]=obj;
 
-name:n,
-
-price:price.value||0,
-
-currency:currency.value,
-
-weight:weight.value||0
-
-});
+}
 
 saveDB();
 
-name.value="";
-
-price.value="";
-
-weight.value="";
-
-date.value=today();
+clearForm();
 
 renderTable();
 
@@ -196,70 +221,29 @@ suggestions.style.display="none";
 
 };
 
-$("txt").onchange=async e=>{
-
-const f=e.target.files[0];
-
-if(!f) return;
-
-const txt=await f.text();
-
-txt
-.split(/\r?\n/)
-.map(i=>i.trim())
-.filter(Boolean)
-.forEach(v=>{
-
-if(!names.includes(v))
-
-names.push(v);
-
-});
-
-names.sort();
-
-saveDB();
-
-alert("Đã cập nhật NameList!");
-
-};
-
 $("excel").onclick=()=>{
 
 const table=[
-
 ["Ngày nhập","Tên sản phẩm","Giá","Trọng lượng","Tiền tệ"]
-
 ];
 
 data.forEach(i=>{
 
 table.push([
-
 i.date,
-
 i.name,
-
 i.price,
-
 i.weight,
-
 i.currency
-
 ]);
 
 });
 
-const csv=table
-.map(r=>r.join(","))
-.join("\n");
+const csv=table.map(r=>r.join(",")).join("\n");
 
 const blob=new Blob(
-
 ["\ufeff"+csv],
-
 {type:"text/csv;charset=utf-8;"}
-
 );
 
 const a=document.createElement("a");
@@ -281,7 +265,6 @@ renderTable();
 setTimeout(()=>{
 
 splash.style.display="none";
-
 app.classList.remove("hidden");
 
 },600);
