@@ -15,62 +15,61 @@
 <body>
 
 <div id="splash">
-  <div class="logo">💳</div>
-  <h1>Chi Tiêu</h1>
+    <div class="logo">💳</div>
+    <h1>Chi Tiêu</h1>
 </div>
 
 <main id="app" class="hidden">
 
-  <h2>Quản lý chi tiêu</h2>
+<h2>Quản lý chi tiêu</h2>
 
-  <div class="field">
-      <input id="name" placeholder="Tên sản phẩm" autocomplete="off">
-      <div id="suggestions"></div>
-  </div>
+<div class="field">
+    <input id="name" placeholder="Tên sản phẩm" autocomplete="off">
+    <div id="suggestions"></div>
+</div>
 
-  <div class="row">
-      <input id="price" type="number" placeholder="Giá">
-      <select id="currency">
-          <option>VND</option>
-          <option>JPY</option>
-      </select>
-  </div>
+<div class="row">
+    <input id="price" type="number" placeholder="Giá">
+    <select id="currency">
+        <option value="VND">VND</option>
+        <option value="JPY">JPY</option>
+    </select>
+</div>
 
-  <div class="row">
-      <input id="weight" type="number" placeholder="Trọng lượng">
-      <select id="unit">
-          <option>g</option>
-          <option>kg</option>
-      </select>
-  </div>
+<div class="row">
+    <input id="weight" type="number" placeholder="Trọng lượng">
+    <div class="unitbox">g</div>
+</div>
 
-  <input id="date" type="date">
+<input id="date" type="date">
 
-  <button id="save">ENTER</button>
+<button id="save">ENTER</button>
 
-  <div class="toolbar">
-      <label class="toolbtn">
-          📄 AddNameList
-          <input type="file" id="txt" accept=".txt" hidden>
-      </label>
+<div class="toolbar">
+    <label class="toolbtn">
+        📄 AddNameList
+        <input id="txt" type="file" accept=".txt" hidden>
+    </label>
 
-      <button class="toolbtn" id="excel">
-          ⬇ Xuất Excel
-      </button>
-  </div>
+    <button class="toolbtn" id="excel">
+        ⬇ Xuất Excel
+    </button>
+</div>
 
-  <input id="search" placeholder="🔍 Tìm sản phẩm">
+<input id="search" placeholder="🔍 Tìm sản phẩm">
 
-  <table>
-      <thead>
-      <tr>
-          <th>Ngày</th>
-          <th>Tên</th>
-          <th>Giá</th>
-      </tr>
-      </thead>
-      <tbody id="rows"></tbody>
-  </table>
+<table>
+<thead>
+<tr>
+    <th>Ngày</th>
+    <th>Tên</th>
+    <th>Giá</th>
+</tr>
+</thead>
+
+<tbody id="rows"></tbody>
+
+</table>
 
 </main>
 
