@@ -21,7 +21,21 @@
 <main id="app" class="hidden">
 
 <h2>Quản lý chi tiêu</h2>
+<div class="stats">
 
+  <div class="statbox">
+      <div class="label">Hôm nay</div>
+      <div id="todayTotal" class="money">0</div>
+      <div id="todayCurrency" class="currency">VND</div>
+  </div>
+
+  <div class="statbox">
+      <div class="label">Tháng này</div>
+      <div id="monthTotal" class="money">0</div>
+      <div id="monthCurrency" class="currency">VND</div>
+  </div>
+
+</div>
 <div class="field">
     <input id="name" placeholder="Tên sản phẩm" autocomplete="off">
     <div id="suggestions"></div>
