@@ -1,199 +1,352 @@
+:root{
+    --blue:#2563EB;
+    --soft:#EAF7FF;
+    --soft2:#DBEAFE;
+    --border:#BFDBFE;
+    --text:#1E293B;
+}
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
 body{
-margin:0;
-font-family:-apple-system,sans-serif;
-background:#EAF7FF;
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--soft);
+    color:var(--text);
 }
 
 .hidden{
-display:none !important;
+    display:none !important;
 }
 
-.page{
-max-width:430px;
-margin:auto;
-padding:18px;
-}
-
-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-header button{
-width:40px;
-height:40px;
-border:none;
-border-radius:12px;
-background:#DBEAFE;
-}
-
-.stats{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin:15px 0;
-}
-
-.box{
-background:white;
-border-radius:16px;
-padding:12px;
-}
-
-.field{position:relative}
-
-#suggestions{
-position:absolute;
-top:46px;
-left:0;
-right:0;
-background:white;
-border-radius:12px;
-display:none;
-box-shadow:0 8px 18px rgba(0,0,0,.08);
-z-index:99;
-max-height:180px;
-overflow:auto;
-}
-
-.item{
-padding:10px;
-border-bottom:1px solid #eee;
-}
-
-input,button{
-width:100%;
-padding:12px;
-font-size:16px;
-border-radius:14px;
-border:1px solid #BFDBFE;
-box-sizing:border-box;
-margin-top:10px;
-}
-
-.row{
-display:grid;
-grid-template-columns:1fr 60px;
-gap:8px;
-}
-
-.unit{
-background:#DBEAFE;
-display:flex;
-justify-content:center;
-align-items:center;
-border-radius:14px;
-margin-top:10px;
-font-weight:bold;
-}
-
-.total{
-margin-top:10px;
-padding:12px;
-background:#DBEAFE;
-border-radius:14px;
-font-weight:bold;
-display:flex;
-justify-content:space-between;
-}
-
-#save{
-background:#2563EB;
-color:white;
-border:none;
-}
-
-.toolbar{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-top:10px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:12px;
-background:white;
-border-radius:14px;
-overflow:hidden;
-}
-
-td,th{
-padding:10px;
-border-bottom:1px solid #eee;
-}
-
-tr{
-transition:.2s;
-}
-
-.currencySwitch{
-display:flex;
-justify-content:center;
-gap:10px;
-margin:10px 0;
-}
-
-.cur,.tab{
-padding:10px 20px;
-border-radius:20px;
-border:none;
-background:#DBEAFE;
-}
-
-.active{
-background:#2563EB;
-color:white;
-}
-
-.bottomTabs{
-display:flex;
-justify-content:space-around;
-margin-top:15px;
-}
-
-canvas{
-width:100%;
-background:white;
-border-radius:16px;
-margin-top:10px;
-}
-
-.modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.35);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-
-.modal.hidden{
-display:none !important;
-}
-
-.popup{
-width:260px;
-background:white;
-padding:20px;
-border-radius:18px;
-}
+/* ================= Splash ================= */
 
 #splash{
-position:fixed;
-inset:0;
-background:linear-gradient(#7DD3FC,#2563EB);
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-color:white;
-z-index:999;
+    position:fixed;
+    inset:0;
+    background:linear-gradient(180deg,#7DD3FC,#2563EB);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:white;
+    z-index:9999;
 }
 
 .logo{
-font-size:56px;
+    font-size:60px;
+    width:110px;
+    height:110px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#ffffff30;
+    border-radius:28px;
+}
+
+#splash h1{
+    margin-top:16px;
+    font-size:28px;
+}
+
+/* ================= Page ================= */
+
+.page{
+    max-width:430px;
+    margin:auto;
+    padding:18px;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.topbar h1{
+    margin:0;
+    font-size:28px;
+    color:var(--blue);
+}
+
+.iconBtn{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:14px;
+    background:var(--soft2);
+    font-size:20px;
+}
+
+/* ================= Summary ================= */
+
+.summary{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin:18px 0;
+}
+
+.summaryBox{
+    background:white;
+    border-radius:18px;
+    padding:14px;
+}
+
+.summaryBox span{
+    font-size:13px;
+    color:#64748B;
+}
+
+.summaryBox h2{
+    margin:8px 0 0;
+    color:var(--blue);
+    font-size:24px;
+}
+
+/* ================= Input ================= */
+
+.field{
+    position:relative;
+}
+
+input{
+    width:100%;
+    padding:13px;
+    border-radius:16px;
+    border:1px solid var(--border);
+    background:white;
+    font-size:16px;
+    margin-top:10px;
+}
+
+input:focus{
+    outline:none;
+    border-color:var(--blue);
+}
+
+/* Suggestions */
+
+#suggestBox{
+    position:absolute;
+    top:56px;
+    left:0;
+    right:0;
+    background:white;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 10px 24px rgba(0,0,0,.12);
+    display:none;
+    z-index:99;
+    max-height:180px;
+    overflow-y:auto;
+}
+
+.item{
+    padding:12px;
+    border-bottom:1px solid #EEF2FF;
+}
+
+.item:last-child{
+    border:none;
+}
+
+.item:hover{
+    background:#F8FAFF;
+}
+
+/* ================= Total ================= */
+
+.totalBox{
+    margin-top:10px;
+    padding:14px;
+    border-radius:16px;
+    background:var(--soft2);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:bold;
+    color:var(--blue);
+}
+
+.totalBox strong{
+    font-size:20px;
+}
+
+/* ================= Weight ================= */
+
+.row{
+    display:grid;
+    grid-template-columns:1fr 60px;
+    gap:8px;
+}
+
+.unit{
+    margin-top:10px;
+    border-radius:16px;
+    background:var(--soft2);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:var(--blue);
+    font-weight:bold;
+}
+
+/* ================= Button ================= */
+
+.primary{
+    margin-top:14px;
+    width:100%;
+    border:none;
+    background:var(--blue);
+    color:white;
+    padding:14px;
+    border-radius:16px;
+    font-size:17px;
+    font-weight:bold;
+}
+
+.toolRow{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:10px;
+}
+
+.toolRow button{
+    border:none;
+    background:var(--soft2);
+    color:var(--blue);
+    padding:13px;
+    border-radius:16px;
+    font-weight:600;
+}
+
+/* ================= Table ================= */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:14px;
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+}
+
+thead{
+    background:#F8FAFF;
+}
+
+th{
+    text-align:left;
+    padding:12px;
+    font-size:14px;
+    color:#64748B;
+}
+
+td{
+    padding:12px;
+    border-top:1px solid #EEF2FF;
+    font-size:15px;
+}
+
+tbody tr{
+    transition:.18s;
+    touch-action:pan-y;
+}
+
+tbody tr:active{
+    background:#F3F8FF;
+}
+
+/* ================= Statistic ================= */
+
+.currencySwitch{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin:15px 0;
+}
+
+.currencyBtn{
+    border:none;
+    padding:10px 20px;
+    border-radius:22px;
+    background:var(--soft2);
+    color:var(--blue);
+    font-weight:bold;
+}
+
+.bottomTabs{
+    display:flex;
+    justify-content:space-around;
+    margin-top:18px;
+}
+
+.modeBtn{
+    border:none;
+    background:var(--soft2);
+    padding:10px 18px;
+    border-radius:22px;
+    color:var(--blue);
+    font-weight:bold;
+}
+
+.active{
+    background:var(--blue)!important;
+    color:white!important;
+}
+
+#lineChart{
+    width:100%;
+    background:white;
+    border-radius:18px;
+    margin-top:10px;
+}
+
+/* ================= Modal ================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.35);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+
+.dialog{
+    width:270px;
+    background:white;
+    border-radius:20px;
+    padding:20px;
+}
+
+.dialog h3{
+    margin:0 0 14px;
+    text-align:center;
+}
+
+.settingCurrency,
+#btnCloseSetting{
+    width:100%;
+    margin-top:10px;
+    border:none;
+    padding:12px;
+    border-radius:14px;
+    background:var(--soft2);
+    font-size:16px;
+}
+
+.settingCurrency.active{
+    background:var(--blue);
+    color:white;
+}
+
+#btnCloseSetting{
+    background:#E5E7EB;
 }
