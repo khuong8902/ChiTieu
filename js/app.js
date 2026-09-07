@@ -1,439 +1,621 @@
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", async ()=>{
 
-const $=id=>document.getElementById(id)
+const $ = id => document.getElementById(id);
+const today = ()=> new Date().toISOString().slice(0,10);
 
-const today=()=>new Date().toISOString().slice(0,10)
+// ===== Elements =====
+const splash = $("splash");
+const home = $("homePage");
+const stat = $("statPage");
 
-let settings=JSON.parse(localStorage.settings||'{"currency":"JPY"}')
+const name = $("productName");
+const price = $("price");
+const qty = $("quantity");
+const weight = $("weight");
+const date = $("inputDate");
 
-let names=JSON.parse(localStorage.names||
-'["Sữa","Trứng","Cà chua","Chuối","Cá hồi"]')
+const suggest = $("suggestBox");
+const tbody = $("tableBody");
 
-let data=JSON.parse(localStorage.data||"[]")
+const totalPrice = $("totalPrice");
+const todayTotal = $("todayTotal");
+const monthTotal = $("monthTotal");
 
-let edit=-1
+const search = $("search");
+const saveBtn = $("btnSave");
 
-date.value=today()
+const settingModal = $("settingModal");
 
-//================== SAVE ==================
+// ===== Data =====
+let editIndex = -1;
 
+let setting = JSON.parse(
+localStorage.getItem("setting") ||
+'{"currency":"JPY"}'
+);
+
+let names = JSON.parse(
+localStorage.getItem("names") ||
+'[]'
+);
+
+let expenses = JSON.parse(
+localStorage.getItem("expenses") ||
+"[]"
+);
+
+// ===== Date =====
+date.value = today();
+
+// ===== Save =====
 function saveDB(){
 
-localStorage.settings=JSON.stringify(settings)
-localStorage.names=JSON.stringify(names)
-localStorage.data=JSON.stringify(data)
+localStorage.setItem("setting",JSON.stringify(setting));
+localStorage.setItem("names",JSON.stringify(names));
+localStorage.setItem("expenses",JSON.stringify(expenses));
 
 }
 
-//================== NAME ==================
-
-async function syncName(){
-
+// ===== Read NameList =====
 try{
 
-const t=await (await fetch("NameList.txt")).text()
+const txt = await fetch("NameList.txt").then(r=>r.text());
 
-t.split(/\r?\n/)
+txt.split(/\r?\n/)
+.map(i=>i.trim())
 .filter(Boolean)
-.forEach(i=>{
-if(!names.includes(i)) names.push(i)
-})
-
-saveDB()
-
-}catch{}
-
-}
-
-function normalize(s){
-
-return s.toLowerCase()
-.normalize("NFD")
-.replace(/[\u0300-\u036f]/g,"")
-
-}
-
-name.oninput=()=>{
-
-const q=normalize(name.value)
-
-suggestions.innerHTML=""
-
-if(!q){
-suggestions.style.display="none"
-return
-}
-
-names.filter(i=>normalize(i).includes(q))
 .forEach(v=>{
 
-const d=document.createElement("div")
+if(!names.includes(v))
+names.push(v);
 
-d.className="item"
+});
 
-d.textContent=v
+saveDB();
 
-d.onclick=()=>{
-name.value=v
-suggestions.style.display="none"
-}
+}catch(e){
 
-suggestions.appendChild(d)
-
-})
-
-suggestions.style.display="block"
+console.log("Không đọc được NameList");
 
 }
 
-//================ TOTAL ===================
+// ===== Normalize =====
 
-function calc(){
+function normalize(str){
 
-const p=Number(price.value)||0
-const q=Number(qty.value)||1
-
-totalMoney.textContent=
-(p*q).toLocaleString()+" "+settings.currency
+return str
+.toLowerCase()
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g,"");
 
 }
 
-price.oninput=calc
-qty.oninput=calc
+// ===== Suggest =====
 
-//================ TABLE ===================
+function renderSuggest(){
 
-function render(){
+const q = normalize(name.value);
 
-rows.innerHTML=""
+suggest.innerHTML="";
 
-const q=normalize(search.value)
+if(q===""){
 
-data
+suggest.style.display="none";
+return;
+
+}
+
+const list = names.filter(i=>
+normalize(i).includes(q)
+);
+
+list.forEach(v=>{
+
+const div=document.createElement("div");
+
+div.className="item";
+
+div.textContent=v;
+
+div.onclick=()=>{
+
+name.value=v;
+suggest.style.display="none";
+
+};
+
+suggest.appendChild(div);
+
+});
+
+suggest.style.display=
+list.length ? "block":"none";
+
+}
+
+name.addEventListener("input",renderSuggest);
+
+// ===== Total =====
+
+function calcTotal(){
+
+const p=Number(price.value)||0;
+const q=Number(qty.value)||1;
+
+const total=p*q;
+
+totalPrice.textContent=
+total.toLocaleString()+" "+setting.currency;
+
+}
+
+price.oninput=calcTotal;
+qty.oninput=calcTotal;
+
+// ===== Summary =====
+
+function renderSummary(){
+
+const t=today();
+const month=t.slice(0,7);
+
+let td=0;
+let mt=0;
+
+expenses.forEach(i=>{
+
+if(i.date===t)
+td+=i.total;
+
+if(i.date.startsWith(month))
+mt+=i.total;
+
+});
+
+todayTotal.textContent=
+td.toLocaleString()+" "+setting.currency;
+
+monthTotal.textContent=
+mt.toLocaleString()+" "+setting.currency;
+
+}
+
+// ===== Table =====
+
+function renderTable(){
+
+tbody.innerHTML="";
+
+const q=normalize(search.value);
+
+expenses
 .filter(i=>normalize(i.name).includes(q))
-.forEach((r,i)=>{
+.forEach((item,index)=>{
 
-const tr=document.createElement("tr")
+const tr=document.createElement("tr");
 
 tr.innerHTML=`
-<td>${r.date}</td>
-<td>${r.name}</td>
-<td>${Number(r.total).toLocaleString()}</td>`
+<td>${item.date}</td>
+<td>${item.name}</td>
+<td>${item.total.toLocaleString()}</td>`;
 
-let start=0
+let startX=0;
 
-tr.ontouchstart=e=>start=e.touches[0].clientX
+tr.addEventListener("touchstart",e=>{
 
-tr.ontouchend=e=>{
+startX=e.touches[0].clientX;
 
-const dx=e.changedTouches[0].clientX-start
+});
+
+tr.addEventListener("touchend",e=>{
+
+const dx=e.changedTouches[0].clientX-startX;
 
 if(dx<-70){
 
 if(confirm("Xóa mục này?")){
 
-data.splice(i,1)
-saveDB()
-render()
-renderStat()
+expenses.splice(index,1);
+
+saveDB();
+
+renderTable();
+
+renderSummary();
+
+drawChart(currentMode);
 
 }
 
 }else{
 
-loadEdit(i)
+loadEdit(index);
 
 }
 
-}
+});
 
-tr.onclick=()=>loadEdit(i)
+tr.onclick=()=>loadEdit(index);
 
-rows.appendChild(tr)
+tbody.appendChild(tr);
 
-})
-
-}
-
-function loadEdit(i){
-
-const r=data[i]
-
-edit=i
-
-name.value=r.name
-price.value=r.price
-qty.value=r.qty
-weight.value=r.weight
-date.value=r.date
-
-calc()
-
-save.textContent="CẬP NHẬT"
+});
 
 }
 
-//=============== SAVE =====================
+// ===== Load Edit =====
 
-save.onclick=()=>{
+function loadEdit(index){
+
+const item=expenses[index];
+
+editIndex=index;
+
+name.value=item.name;
+price.value=item.price;
+qty.value=item.qty;
+weight.value=item.weight;
+date.value=item.date;
+
+calcTotal();
+
+saveBtn.textContent="CẬP NHẬT";
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+// ===== Clear =====
+
+function clearForm(){
+
+name.value="";
+price.value="";
+qty.value=1;
+weight.value="";
+date.value=today();
+
+editIndex=-1;
+
+saveBtn.textContent="ENTER";
+
+calcTotal();
+
+}
+
+// ===== Save Button =====
+
+saveBtn.onclick=()=>{
 
 const obj={
 
 date:date.value,
 
-name:name.value,
+name:name.value.trim(),
 
-price:Number(price.value),
+price:Number(price.value)||0,
 
-qty:Number(qty.value),
+qty:Number(qty.value)||1,
 
-total:Number(price.value)*Number(qty.value),
+weight:Number(weight.value)||0,
 
-weight:Number(weight.value)
+total:(Number(price.value)||0)*(Number(qty.value)||1)
+
+};
+
+if(obj.name==="") return;
+
+if(editIndex===-1){
+
+expenses.unshift(obj);
+
+if(!names.includes(obj.name)){
+
+names.push(obj.name);
+names.sort();
 
 }
-
-if(!obj.name) return
-
-if(edit==-1){
-
-data.unshift(obj)
-
-if(!names.includes(obj.name)) names.push(obj.name)
 
 }else{
 
-data[edit]=obj
-
-edit=-1
-
-save.textContent="ENTER"
+expenses[editIndex]=obj;
 
 }
 
-saveDB()
+saveDB();
 
-name.value=""
-price.value=""
-qty.value=1
-weight.value=""
-date.value=today()
+clearForm();
 
-calc()
+renderTable();
 
-render()
+renderSummary();
 
-renderStat()
+drawChart(currentMode);
 
-}
+};
 
-//============== EXCEL =====================
+// ===== Search =====
 
-excel.onclick=()=>{
+search.oninput=renderTable;
 
-const rowsData=[
-["Ngày nhập","Tên","Giá","Số lượng","Tổng tiền","Trọng lượng","Tiền tệ"]
-]
+// ===== Excel =====
 
-data.forEach(i=>{
+$("btnExcel").onclick=()=>{
 
-rowsData.push([
-i.date,
-i.name,
-i.price,
-i.qty,
-i.total,
-i.weight,
-settings.currency
-])
+let csv="Ngày nhập,Tên sản phẩm,Giá,Số lượng,Tổng tiền,Trọng lượng,Tiền tệ\n";
 
-})
+expenses.forEach(i=>{
 
-const csv=rowsData.map(r=>r.join(",")).join("\n")
+csv+=`${i.date},${i.name},${i.price},${i.qty},${i.total},${i.weight},${setting.currency}\n`;
 
-const blob=new Blob(["\ufeff"+csv],{type:"text/csv"})
+});
 
-const a=document.createElement("a")
+const blob=new Blob(
+["\ufeff"+csv],
+{type:"text/csv;charset=utf-8;"}
+);
 
-a.href=URL.createObjectURL(blob)
+const a=document.createElement("a");
 
-a.download="DuLieuChiTieu.csv"
+a.href=URL.createObjectURL(blob);
 
-a.click()
+a.download="DuLieuChiTieu.csv";
 
-}
+a.click();
 
-//============ STAT =======================
+};
 
-function renderStat(){
+// ===== Setting =====
 
-const now=new Date()
+$("btnSetting").onclick=()=>{
 
-const t=today()
+settingModal.classList.remove("hidden");
 
-const m=t.slice(0,7)
+};
 
-let td=0,th=0
+$("btnCloseSetting").onclick=()=>{
 
-data.forEach(i=>{
+settingModal.classList.add("hidden");
 
-if(i.date==t) td+=i.total
+};
 
-if(i.date.startsWith(m)) th+=i.total
+settingModal.onclick=e=>{
 
-})
+if(e.target===settingModal){
 
-todayValue.textContent=td.toLocaleString()+" "+settings.currency
-
-monthValue.textContent=th.toLocaleString()+" "+settings.currency
-
-drawChart("week")
+settingModal.classList.add("hidden");
 
 }
 
-let currentCur="JPY"
+};
 
-document.querySelectorAll(".cur").forEach(b=>{
+document.querySelectorAll(".settingCurrency").forEach(btn=>{
 
-b.onclick=()=>{
+if(btn.dataset.value===setting.currency)
+btn.classList.add("active");
+else
+btn.classList.remove("active");
 
-document.querySelectorAll(".cur").forEach(i=>i.classList.remove("active"))
+btn.onclick=()=>{
 
-b.classList.add("active")
+setting.currency=btn.dataset.value;
 
-currentCur=b.dataset.cur
+document.querySelectorAll(".settingCurrency")
+.forEach(i=>i.classList.remove("active"));
 
-drawChart(document.querySelector(".tab.active").dataset.mode)
+btn.classList.add("active");
 
-}
+saveDB();
 
-})
+calcTotal();
 
-document.querySelectorAll(".tab").forEach(b=>{
+renderSummary();
 
-b.onclick=()=>{
+};
 
-document.querySelectorAll(".tab").forEach(i=>i.classList.remove("active"))
+});
 
-b.classList.add("active")
+// ===== Page =====
 
-drawChart(b.dataset.mode)
+$("btnStatistic").onclick=()=>{
 
-}
+home.classList.add("hidden");
 
-})
+stat.classList.remove("hidden");
+
+drawChart(currentMode);
+
+};
+
+$("btnBack").onclick=()=>{
+
+stat.classList.add("hidden");
+
+home.classList.remove("hidden");
+
+};
+
+// ===== Currency Switch =====
+
+let currentCurrency="JPY";
+
+document.querySelectorAll(".currencyBtn").forEach(btn=>{
+
+btn.onclick=()=>{
+
+document.querySelectorAll(".currencyBtn")
+.forEach(i=>i.classList.remove("active"));
+
+btn.classList.add("active");
+
+currentCurrency=btn.dataset.cur;
+
+drawChart(currentMode);
+
+};
+
+});
+
+// ===== Mode =====
+
+let currentMode="week";
+
+document.querySelectorAll(".modeBtn").forEach(btn=>{
+
+btn.onclick=()=>{
+
+document.querySelectorAll(".modeBtn")
+.forEach(i=>i.classList.remove("active"));
+
+btn.classList.add("active");
+
+currentMode=btn.dataset.mode;
+
+drawChart(currentMode);
+
+};
+
+});
+
+// ===== Chart =====
 
 function drawChart(mode){
 
-const c=chart.getContext("2d")
+const canvas=$("lineChart");
 
-c.clearRect(0,0,320,180)
+const ctx=canvas.getContext("2d");
 
-c.strokeStyle="#2563EB"
-c.lineWidth=3
+ctx.clearRect(0,0,360,200);
 
-let arr=[]
+// grid
+ctx.strokeStyle="#E5E7EB";
+ctx.lineWidth=1;
 
-if(mode=="week") arr=[1200,800,1600,900,1800,1400,2200]
-if(mode=="month") arr=[3500,5200,4800,6300]
-if(mode=="year") arr=[4,6,5,8,7,9,10,11,9,12,13,15].map(i=>i*1000)
+for(let i=0;i<4;i++){
 
-const max=Math.max(...arr)
+const y=30+i*40;
 
-c.beginPath()
+ctx.beginPath();
+ctx.moveTo(30,y);
+ctx.lineTo(330,y);
+ctx.stroke();
+
+}
+
+let arr=[];
+
+const now=new Date();
+
+if(mode==="week"){
+
+arr=new Array(7).fill(0);
+
+expenses.forEach(i=>{
+
+const d=new Date(i.date);
+
+const day=(d.getDay()+6)%7;
+
+arr[day]+=i.total;
+
+});
+
+}
+
+if(mode==="month"){
+
+arr=[0,0,0,0,0];
+
+expenses.forEach(i=>{
+
+const d=new Date(i.date);
+
+if(d.getMonth()===now.getMonth()){
+
+const w=Math.min(4,Math.floor((d.getDate()-1)/7));
+
+arr[w]+=i.total;
+
+}
+
+});
+
+}
+
+if(mode==="year"){
+
+arr=new Array(12).fill(0);
+
+expenses.forEach(i=>{
+
+const d=new Date(i.date);
+
+if(d.getFullYear()===now.getFullYear()){
+
+arr[d.getMonth()]+=i.total;
+
+}
+
+});
+
+}
+
+const max=Math.max(...arr,1);
+
+ctx.strokeStyle="#2563EB";
+ctx.lineWidth=3;
+
+ctx.beginPath();
 
 arr.forEach((v,i)=>{
 
-const x=30+i*(260/(arr.length-1))
+const x=30+i*(300/(arr.length-1));
+const y=170-(v/max)*120;
 
-const y=150-(v/max)*110
+if(i===0)
+ctx.moveTo(x,y);
+else
+ctx.lineTo(x,y);
 
-if(i==0) c.moveTo(x,y)
-else c.lineTo(x,y)
-
-c.fillStyle="#2563EB"
-c.beginPath()
-c.arc(x,y,4,0,6.28)
-c.fill()
-
-})
-
-c.stroke()
-
-}
-
-//============ PAGE =======================
-
-statBtn.onclick=()=>{
-
-home.classList.add("hidden")
-stat.classList.remove("hidden")
-
-drawChart("week")
-
-}
-
-back.onclick=()=>{
-
-stat.classList.add("hidden")
-home.classList.remove("hidden")
-
-}
-
-const settingModal = $("setting");
-const closeSetting = $("closeSetting");
-
-settingBtn.onclick = () => {
-    settingModal.classList.remove("hidden");
-};
-
-closeSetting.onclick = () => {
-    settingModal.classList.add("hidden");
-};
-
-/* Bấm ra vùng tối cũng đóng popup */
-settingModal.addEventListener("click",(e)=>{
-    if(e.target===settingModal){
-        settingModal.classList.add("hidden");
-    }
 });
 
-document.querySelectorAll(".setCurrency").forEach(b=>{
+ctx.stroke();
 
-b.onclick=()=>{
+// points
+ctx.fillStyle="#2563EB";
 
-settings.currency=b.dataset.value
+arr.forEach((v,i)=>{
 
-saveDB()
+const x=30+i*(300/(arr.length-1));
+const y=170-(v/max)*120;
 
-renderStat()
+ctx.beginPath();
+ctx.arc(x,y,4,0,Math.PI*2);
+ctx.fill();
 
-calc()
-
-setting.classList.add("hidden")
+});
 
 }
 
-})
+// ===== Start =====
 
-search.oninput=render
+calcTotal();
 
-//=========== START =======================
+renderTable();
 
-syncName()
+renderSummary();
 
-calc()
-
-render()
-
-renderStat()
+drawChart("week");
 
 setTimeout(()=>{
 
-splash.style.display="none"
+splash.style.display="none";
 
-home.classList.remove("hidden")
+home.classList.remove("hidden");
 
-},600)
+},600);
 
-})
+});
