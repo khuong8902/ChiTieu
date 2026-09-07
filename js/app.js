@@ -1,620 +1,797 @@
-document.addEventListener("DOMContentLoaded", async ()=>{
+// =============================
+// Chi Tieu V2.1 Stable
+// Part 1/2
+// =============================
 
-const $ = id => document.getElementById(id);
-const today = ()=> new Date().toISOString().slice(0,10);
+document.addEventListener("DOMContentLoaded", async () => {
 
-// ===== Elements =====
+const $ = (id) => document.getElementById(id);
+
+const today = () => new Date().toISOString().slice(0,10);
+
+const format = (num)=>{
+    return Number(num || 0).toLocaleString("en-US");
+};
+
+//=======================
+// Elements
+//=======================
+
 const splash = $("splash");
-const home = $("homePage");
-const stat = $("statPage");
 
-const name = $("productName");
+const homePage = $("homePage");
+const statPage = $("statPage");
+
+const productName = $("productName");
 const price = $("price");
-const qty = $("quantity");
+const quantity = $("quantity");
 const weight = $("weight");
-const date = $("inputDate");
+const inputDate = $("inputDate");
 
-const suggest = $("suggestBox");
-const tbody = $("tableBody");
+const suggestBox = $("suggestBox");
+
+const tableBody = $("tableBody");
 
 const totalPrice = $("totalPrice");
+
 const todayTotal = $("todayTotal");
 const monthTotal = $("monthTotal");
 
 const search = $("search");
-const saveBtn = $("btnSave");
 
-const settingModal = $("settingModal");
+const btnSave = $("btnSave");
 
-// ===== Data =====
-let editIndex = -1;
+//=======================
+// Local Storage
+//=======================
 
 let setting = JSON.parse(
-localStorage.getItem("setting") ||
-'{"currency":"JPY"}'
+    localStorage.getItem("setting") ||
+    '{"currency":"JPY"}'
 );
 
-let names = JSON.parse(
-localStorage.getItem("names") ||
-'[]'
+let nameList = JSON.parse(
+    localStorage.getItem("nameList") ||
+    "[]"
 );
 
-let expenses = JSON.parse(
-localStorage.getItem("expenses") ||
-"[]"
+let expenseData = JSON.parse(
+    localStorage.getItem("expenseData") ||
+    "[]"
 );
 
-// ===== Date =====
-date.value = today();
+let editIndex = -1;
 
-// ===== Save =====
-function saveDB(){
+//=======================
+// Default Date
+//=======================
 
-localStorage.setItem("setting",JSON.stringify(setting));
-localStorage.setItem("names",JSON.stringify(names));
-localStorage.setItem("expenses",JSON.stringify(expenses));
+inputDate.value = today();
 
-}
+//=======================
+// Read NameList.txt
+//=======================
 
-// ===== Read NameList =====
 try{
 
-const txt = await fetch("NameList.txt").then(r=>r.text());
+    const txt = await fetch("NameList.txt").then(r=>r.text());
 
-txt.split(/\r?\n/)
-.map(i=>i.trim())
-.filter(Boolean)
-.forEach(v=>{
+    txt.split(/\r?\n/)
+       .map(i=>i.trim())
+       .filter(Boolean)
+       .forEach(v=>{
 
-if(!names.includes(v))
-names.push(v);
+            if(!nameList.includes(v)){
+                nameList.push(v);
+            }
 
-});
-
-saveDB();
+       });
 
 }catch(e){
+    console.log("Không đọc được NameList.txt");
+}
 
-console.log("Không đọc được NameList");
+//=======================
+// Save Local
+//=======================
+
+function saveDB(){
+
+    localStorage.setItem(
+        "setting",
+        JSON.stringify(setting)
+    );
+
+    localStorage.setItem(
+        "nameList",
+        JSON.stringify(nameList)
+    );
+
+    localStorage.setItem(
+        "expenseData",
+        JSON.stringify(expenseData)
+    );
 
 }
 
-// ===== Normalize =====
+//=======================
+// Normalize
+//=======================
 
 function normalize(str){
 
-return str
-.toLowerCase()
-.normalize("NFD")
-.replace(/[\u0300-\u036f]/g,"");
+    return (str || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g,"");
 
 }
 
-// ===== Suggest =====
+//=======================
+// Suggest
+//=======================
 
 function renderSuggest(){
 
-const q = normalize(name.value);
+    const key = normalize(productName.value);
 
-suggest.innerHTML="";
+    suggestBox.innerHTML = "";
 
-if(q===""){
+    if(key===""){
 
-suggest.style.display="none";
-return;
+        suggestBox.style.display="none";
+        return;
+
+    }
+
+    const result = nameList
+        .filter(i=>normalize(i).includes(key))
+        .sort((a,b)=>{
+
+            const ca = expenseData.filter(x=>x.name===a).length;
+            const cb = expenseData.filter(x=>x.name===b).length;
+
+            return cb-ca;
+
+        })
+        .slice(0,8);
+
+    result.forEach(v=>{
+
+        const div=document.createElement("div");
+
+        div.className="item";
+
+        div.textContent=v;
+
+        div.onclick=()=>{
+
+            productName.value=v;
+
+            suggestBox.style.display="none";
+
+        };
+
+        suggestBox.appendChild(div);
+
+    });
+
+    suggestBox.style.display =
+        result.length ? "block":"none";
 
 }
 
-const list = names.filter(i=>
-normalize(i).includes(q)
-);
+productName.addEventListener("input",renderSuggest);
 
-list.forEach(v=>{
+document.addEventListener("click",(e)=>{
 
-const div=document.createElement("div");
+    if(!e.target.closest(".field")){
 
-div.className="item";
+        suggestBox.style.display="none";
 
-div.textContent=v;
-
-div.onclick=()=>{
-
-name.value=v;
-suggest.style.display="none";
-
-};
-
-suggest.appendChild(div);
+    }
 
 });
 
-suggest.style.display=
-list.length ? "block":"none";
+//=======================
+// Total Money
+//=======================
+
+function updateTotal(){
+
+    const p = Number(price.value)||0;
+
+    const q = Number(quantity.value)||0;
+
+    const total = p*q;
+
+    totalPrice.textContent =
+        format(total)+" "+setting.currency;
 
 }
 
-name.addEventListener("input",renderSuggest);
+price.oninput=updateTotal;
 
-// ===== Total =====
+quantity.oninput=updateTotal;
 
-function calcTotal(){
-
-const p=Number(price.value)||0;
-const q=Number(qty.value)||1;
-
-const total=p*q;
-
-totalPrice.textContent=
-total.toLocaleString()+" "+setting.currency;
-
-}
-
-price.oninput=calcTotal;
-qty.oninput=calcTotal;
-
-// ===== Summary =====
+//=======================
+// Summary
+//=======================
 
 function renderSummary(){
 
-const t=today();
-const month=t.slice(0,7);
+    const td = today();
 
-let td=0;
-let mt=0;
+    const month = td.slice(0,7);
 
-expenses.forEach(i=>{
+    let todayMoney=0;
 
-if(i.date===t)
-td+=i.total;
+    let monthMoney=0;
 
-if(i.date.startsWith(month))
-mt+=i.total;
+    expenseData.forEach(i=>{
 
-});
+        if(i.date===td){
 
-todayTotal.textContent=
-td.toLocaleString()+" "+setting.currency;
+            todayMoney+=i.total;
 
-monthTotal.textContent=
-mt.toLocaleString()+" "+setting.currency;
+        }
+
+        if(i.date.startsWith(month)){
+
+            monthMoney+=i.total;
+
+        }
+
+    });
+
+    todayTotal.textContent =
+        format(todayMoney)+" "+setting.currency;
+
+    monthTotal.textContent =
+        format(monthMoney)+" "+setting.currency;
 
 }
 
-// ===== Table =====
+//=======================
+// Table
+//=======================
 
 function renderTable(){
 
-tbody.innerHTML="";
+    tableBody.innerHTML="";
 
-const q=normalize(search.value);
+    const key = normalize(search.value);
 
-expenses
-.filter(i=>normalize(i.name).includes(q))
-.forEach((item,index)=>{
+    expenseData
+        .filter(i=>normalize(i.name).includes(key))
+        .forEach((item,index)=>{
 
-const tr=document.createElement("tr");
+        const tr=document.createElement("tr");
 
-tr.innerHTML=`
-<td>${item.date}</td>
-<td>${item.name}</td>
-<td>${item.total.toLocaleString()}</td>`;
+        tr.innerHTML=`
+            <td>${item.date}</td>
+            <td>${item.name}</td>
+            <td>${format(item.total)}</td>
+        `;
 
-let startX=0;
+        // Touch Delete
 
-tr.addEventListener("touchstart",e=>{
+        let startX=0;
 
-startX=e.touches[0].clientX;
+        tr.addEventListener("touchstart",(e)=>{
 
-});
+            startX=e.touches[0].clientX;
 
-tr.addEventListener("touchend",e=>{
+        });
 
-const dx=e.changedTouches[0].clientX-startX;
+        tr.addEventListener("touchend",(e)=>{
 
-if(dx<-70){
+            const dx=e.changedTouches[0].clientX-startX;
 
-if(confirm("Xóa mục này?")){
+            if(dx<-70){
 
-expenses.splice(index,1);
+                if(confirm("Xóa khoản chi này?")){
 
-saveDB();
+                    expenseData.splice(index,1);
 
-renderTable();
+                    saveDB();
 
-renderSummary();
+                    renderTable();
 
-drawChart(currentMode);
+                    renderSummary();
+
+                    drawChart();
+
+                }
+
+            }else{
+
+                loadEdit(index);
+
+            }
+
+        });
+
+        tr.onclick=()=>loadEdit(index);
+
+        tableBody.appendChild(tr);
+
+    });
 
 }
 
-}else{
-
-loadEdit(index);
-
-}
-
-});
-
-tr.onclick=()=>loadEdit(index);
-
-tbody.appendChild(tr);
-
-});
-
-}
-
-// ===== Load Edit =====
+//=======================
+// Edit
+//=======================
 
 function loadEdit(index){
 
-const item=expenses[index];
+    const item = expenseData[index];
 
-editIndex=index;
+    editIndex=index;
 
-name.value=item.name;
-price.value=item.price;
-qty.value=item.qty;
-weight.value=item.weight;
-date.value=item.date;
+    productName.value=item.name;
 
-calcTotal();
+    price.value=item.price;
 
-saveBtn.textContent="CẬP NHẬT";
+    quantity.value=item.qty===0?"":item.qty;
 
-window.scrollTo({
-top:0,
-behavior:"smooth"
-});
+    weight.value=item.weight;
+
+    inputDate.value=item.date;
+
+    btnSave.textContent="CẬP NHẬT";
+
+    updateTotal();
+
+    window.scrollTo({
+
+        top:0,
+
+        behavior:"smooth"
+
+    });
 
 }
 
-// ===== Clear =====
+//=======================
+// Clear
+//=======================
 
 function clearForm(){
 
-name.value="";
-price.value="";
-qty.value=1;
-weight.value="";
-date.value=today();
+    productName.value="";
 
-editIndex=-1;
+    price.value="";
 
-saveBtn.textContent="ENTER";
+    quantity.value="";
 
-calcTotal();
+    weight.value="";
+
+    inputDate.value=today();
+
+    editIndex=-1;
+
+    btnSave.textContent="ENTER";
+
+    updateTotal();
 
 }
 
-// ===== Save Button =====
+//=======================
+// Save Button
+//=======================
 
-saveBtn.onclick=()=>{
+btnSave.onclick=()=>{
 
-const obj={
+    if(productName.value.trim()===""){
 
-date:date.value,
+        alert("Vui lòng nhập tên sản phẩm");
 
-name:name.value.trim(),
+        return;
 
-price:Number(price.value)||0,
+    }
 
-qty:Number(qty.value)||1,
+    const obj={
 
-weight:Number(weight.value)||0,
+        date:inputDate.value,
 
-total:(Number(price.value)||0)*(Number(qty.value)||1)
+        name:productName.value.trim(),
+
+        price:Number(price.value)||0,
+
+        qty:Number(quantity.value)||0,
+
+        weight:Number(weight.value)||0
+
+    };
+
+    obj.total=obj.price*obj.qty;
+
+    if(editIndex===-1){
+
+        expenseData.unshift(obj);
+
+        if(!nameList.includes(obj.name)){
+
+            nameList.push(obj.name);
+
+        }
+
+    }else{
+
+        expenseData[editIndex]=obj;
+
+    }
+
+    saveDB();
+
+    clearForm();
+
+    renderTable();
+
+    renderSummary();
+
+    drawChart();
 
 };
 
-if(obj.name==="") return;
-
-if(editIndex===-1){
-
-expenses.unshift(obj);
-
-if(!names.includes(obj.name)){
-
-names.push(obj.name);
-names.sort();
-
-}
-
-}else{
-
-expenses[editIndex]=obj;
-
-}
-
-saveDB();
-
-clearForm();
-
-renderTable();
-
-renderSummary();
-
-drawChart(currentMode);
-
-};
-
-// ===== Search =====
+//=======================
+// Search
+//=======================
 
 search.oninput=renderTable;
+  //=======================
+// ===== PART 2/2 ======
+//=======================
 
-// ===== Excel =====
+// ---------- Setting ----------
 
-$("btnExcel").onclick=()=>{
+const settingModal = $("settingModal");
 
-let csv="Ngày nhập,Tên sản phẩm,Giá,Số lượng,Tổng tiền,Trọng lượng,Tiền tệ\n";
+$("btnSetting").onclick = () => {
+    settingModal.classList.remove("hidden");
+};
 
-expenses.forEach(i=>{
+$("btnCloseSetting").onclick = () => {
+    settingModal.classList.add("hidden");
+};
 
-csv+=`${i.date},${i.name},${i.price},${i.qty},${i.total},${i.weight},${setting.currency}\n`;
+settingModal.onclick = (e) => {
+    if (e.target === settingModal) {
+        settingModal.classList.add("hidden");
+    }
+};
+
+document.querySelectorAll(".settingCurrency").forEach(btn => {
+
+    if(btn.dataset.value===setting.currency){
+        btn.classList.add("active");
+    }
+
+    btn.onclick = () => {
+
+        setting.currency = btn.dataset.value;
+
+        document
+            .querySelectorAll(".settingCurrency")
+            .forEach(i=>i.classList.remove("active"));
+
+        btn.classList.add("active");
+
+        saveDB();
+
+        updateTotal();
+
+        renderSummary();
+
+    };
 
 });
 
-const blob=new Blob(
-["\ufeff"+csv],
-{type:"text/csv;charset=utf-8;"}
-);
+//=======================
+// Statistic Page
+//=======================
 
-const a=document.createElement("a");
+const monthPicker = $("monthPicker");
+const yearPicker = $("yearPicker");
 
-a.href=URL.createObjectURL(blob);
+monthPicker.value = today().slice(0,7);
 
-a.download="DuLieuChiTieu.csv";
+// Tạo danh sách năm
 
-a.click();
+const currentYear = new Date().getFullYear();
 
-};
+for(let y=currentYear-5;y<=currentYear+2;y++){
 
-// ===== Setting =====
+    const op=document.createElement("option");
 
-$("btnSetting").onclick=()=>{
+    op.value=y;
 
-settingModal.classList.remove("hidden");
+    op.textContent=y;
 
-};
-
-$("btnCloseSetting").onclick=()=>{
-
-settingModal.classList.add("hidden");
-
-};
-
-settingModal.onclick=e=>{
-
-if(e.target===settingModal){
-
-settingModal.classList.add("hidden");
+    yearPicker.appendChild(op);
 
 }
 
-};
+yearPicker.value=currentYear;
 
-document.querySelectorAll(".settingCurrency").forEach(btn=>{
+//=======================
+// Tabs
+//=======================
 
-if(btn.dataset.value===setting.currency)
-btn.classList.add("active");
-else
-btn.classList.remove("active");
+let chartMode="month";
 
-btn.onclick=()=>{
+$("tabMonth").onclick=()=>{
 
-setting.currency=btn.dataset.value;
+    chartMode="month";
 
-document.querySelectorAll(".settingCurrency")
-.forEach(i=>i.classList.remove("active"));
+    $("monthPanel").classList.remove("hidden");
+    $("yearPanel").classList.add("hidden");
 
-btn.classList.add("active");
+    $("tabMonth").classList.add("active");
+    $("tabYear").classList.remove("active");
 
-saveDB();
-
-calcTotal();
-
-renderSummary();
+    drawChart();
 
 };
 
-});
+$("tabYear").onclick=()=>{
 
-// ===== Page =====
+    chartMode="year";
+
+    $("yearPanel").classList.remove("hidden");
+    $("monthPanel").classList.add("hidden");
+
+    $("tabYear").classList.add("active");
+    $("tabMonth").classList.remove("active");
+
+    drawChart();
+
+};
+
+monthPicker.onchange=drawChart;
+yearPicker.onchange=drawChart;
+
+//=======================
+// Line Chart
+//=======================
+
+function drawChart(){
+
+    const canvas = $("lineChart");
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Grid
+
+    ctx.strokeStyle="#E5E7EB";
+
+    ctx.lineWidth=1;
+
+    for(let i=0;i<5;i++){
+
+        const y=20+i*45;
+
+        ctx.beginPath();
+
+        ctx.moveTo(30,y);
+
+        ctx.lineTo(330,y);
+
+        ctx.stroke();
+
+    }
+
+    let data=[];
+
+    if(chartMode==="month"){
+
+        data=new Array(31).fill(0);
+
+        expenseData.forEach(item=>{
+
+            if(item.date.startsWith(monthPicker.value)){
+
+                const d=Number(item.date.slice(8));
+
+                data[d-1]+=item.total;
+
+            }
+
+        });
+
+    }else{
+
+        data=new Array(12).fill(0);
+
+        expenseData.forEach(item=>{
+
+            if(item.date.startsWith(yearPicker.value)){
+
+                const m=Number(item.date.slice(5,7));
+
+                data[m-1]+=item.total;
+
+            }
+
+        });
+
+    }
+
+    const max=Math.max(...data,1);
+
+    // Line
+
+    ctx.strokeStyle="#2563EB";
+    ctx.lineWidth=3;
+
+    ctx.beginPath();
+
+    data.forEach((v,i)=>{
+
+        const x=30+i*(300/(data.length-1));
+
+        const y=190-(v/max)*150;
+
+        if(i===0){
+
+            ctx.moveTo(x,y);
+
+        }else{
+
+            ctx.lineTo(x,y);
+
+        }
+
+    });
+
+    ctx.stroke();
+
+    // Points
+
+    ctx.fillStyle="#2563EB";
+
+    data.forEach((v,i)=>{
+
+        const x=30+i*(300/(data.length-1));
+
+        const y=190-(v/max)*150;
+
+        ctx.beginPath();
+
+        ctx.arc(x,y,4,0,Math.PI*2);
+
+        ctx.fill();
+
+    });
+
+    // Labels
+
+    ctx.fillStyle="#64748B";
+
+    ctx.font="10px sans-serif";
+
+    if(chartMode==="month"){
+
+        for(let i=0;i<31;i+=5){
+
+            const x=30+i*(300/30);
+
+            ctx.fillText(i+1,x-5,210);
+
+        }
+
+    }else{
+
+        for(let i=0;i<12;i++){
+
+            const x=30+i*(300/11);
+
+            ctx.fillText(i+1,x-3,210);
+
+        }
+
+    }
+
+}
+
+//=======================
+// Page Switch
+//=======================
 
 $("btnStatistic").onclick=()=>{
 
-home.classList.add("hidden");
+    homePage.classList.add("hidden");
 
-stat.classList.remove("hidden");
+    statPage.classList.remove("hidden");
 
-drawChart(currentMode);
+    drawChart();
 
 };
 
 $("btnBack").onclick=()=>{
 
-stat.classList.add("hidden");
+    statPage.classList.add("hidden");
 
-home.classList.remove("hidden");
-
-};
-
-// ===== Currency Switch =====
-
-let currentCurrency="JPY";
-
-document.querySelectorAll(".currencyBtn").forEach(btn=>{
-
-btn.onclick=()=>{
-
-document.querySelectorAll(".currencyBtn")
-.forEach(i=>i.classList.remove("active"));
-
-btn.classList.add("active");
-
-currentCurrency=btn.dataset.cur;
-
-drawChart(currentMode);
+    homePage.classList.remove("hidden");
 
 };
 
-});
+//=======================
+// Export Excel (.xlsx)
+//=======================
 
-// ===== Mode =====
+$("btnExcel").onclick=()=>{
 
-let currentMode="week";
+    const excelData=expenseData.map(i=>({
 
-document.querySelectorAll(".modeBtn").forEach(btn=>{
+        "Ngày nhập":i.date,
 
-btn.onclick=()=>{
+        "Tên sản phẩm":i.name,
 
-document.querySelectorAll(".modeBtn")
-.forEach(i=>i.classList.remove("active"));
+        "Giá":i.price,
 
-btn.classList.add("active");
+        "Số lượng":i.qty,
 
-currentMode=btn.dataset.mode;
+        "Tổng tiền":i.total,
 
-drawChart(currentMode);
+        "Trọng lượng (g)":i.weight,
+
+        "Tiền tệ":setting.currency
+
+    }));
+
+    const wb=XLSX.utils.book_new();
+
+    const ws=XLSX.utils.json_to_sheet(excelData);
+
+    // Độ rộng cột
+
+    ws["!cols"]=[
+
+        {wch:14},
+        {wch:24},
+        {wch:12},
+        {wch:10},
+        {wch:14},
+        {wch:16},
+        {wch:10}
+
+    ];
+
+    XLSX.utils.book_append_sheet(
+        wb,
+        ws,
+        "ChiTieu"
+    );
+
+    XLSX.writeFile(
+        wb,
+        "DuLieuChiTieu.xlsx"
+    );
 
 };
 
-});
+//=======================
+// START APP
+//=======================
 
-// ===== Chart =====
-
-function drawChart(mode){
-
-const canvas=$("lineChart");
-
-const ctx=canvas.getContext("2d");
-
-ctx.clearRect(0,0,360,200);
-
-// grid
-ctx.strokeStyle="#E5E7EB";
-ctx.lineWidth=1;
-
-for(let i=0;i<4;i++){
-
-const y=30+i*40;
-
-ctx.beginPath();
-ctx.moveTo(30,y);
-ctx.lineTo(330,y);
-ctx.stroke();
-
-}
-
-let arr=[];
-
-const now=new Date();
-
-if(mode==="week"){
-
-arr=new Array(7).fill(0);
-
-expenses.forEach(i=>{
-
-const d=new Date(i.date);
-
-const day=(d.getDay()+6)%7;
-
-arr[day]+=i.total;
-
-});
-
-}
-
-if(mode==="month"){
-
-arr=[0,0,0,0,0];
-
-expenses.forEach(i=>{
-
-const d=new Date(i.date);
-
-if(d.getMonth()===now.getMonth()){
-
-const w=Math.min(4,Math.floor((d.getDate()-1)/7));
-
-arr[w]+=i.total;
-
-}
-
-});
-
-}
-
-if(mode==="year"){
-
-arr=new Array(12).fill(0);
-
-expenses.forEach(i=>{
-
-const d=new Date(i.date);
-
-if(d.getFullYear()===now.getFullYear()){
-
-arr[d.getMonth()]+=i.total;
-
-}
-
-});
-
-}
-
-const max=Math.max(...arr,1);
-
-ctx.strokeStyle="#2563EB";
-ctx.lineWidth=3;
-
-ctx.beginPath();
-
-arr.forEach((v,i)=>{
-
-const x=30+i*(300/(arr.length-1));
-const y=170-(v/max)*120;
-
-if(i===0)
-ctx.moveTo(x,y);
-else
-ctx.lineTo(x,y);
-
-});
-
-ctx.stroke();
-
-// points
-ctx.fillStyle="#2563EB";
-
-arr.forEach((v,i)=>{
-
-const x=30+i*(300/(arr.length-1));
-const y=170-(v/max)*120;
-
-ctx.beginPath();
-ctx.arc(x,y,4,0,Math.PI*2);
-ctx.fill();
-
-});
-
-}
-
-// ===== Start =====
-
-calcTotal();
+updateTotal();
 
 renderTable();
 
 renderSummary();
 
-drawChart("week");
+drawChart();
 
 setTimeout(()=>{
 
-splash.style.display="none";
+    splash.style.display="none";
 
-home.classList.remove("hidden");
+    homePage.classList.remove("hidden");
 
 },600);
 
