@@ -4,7 +4,9 @@ font-family:-apple-system,sans-serif;
 background:#EAF7FF;
 }
 
-.hidden{display:none}
+.hidden{
+display:none !important;
+}
 
 .page{
 max-width:430px;
@@ -162,10 +164,15 @@ margin-top:10px;
 .modal{
 position:fixed;
 inset:0;
-background:#0005;
+background:rgba(0,0,0,.35);
 display:flex;
 justify-content:center;
 align-items:center;
+z-index:9999;
+}
+
+.modal.hidden{
+display:none !important;
 }
 
 .popup{
