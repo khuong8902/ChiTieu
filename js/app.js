@@ -312,7 +312,21 @@ function renderTable(){
 
         });
 
-        tr.onclick=()=>loadEdit(index);
+        let lastTap = 0;
+
+tr.addEventListener("click", () => {
+
+    const now = Date.now();
+
+    if (now - lastTap < 300) {
+
+        loadEdit(index);
+
+    }
+
+    lastTap = now;
+
+});
 
         tableBody.appendChild(tr);
 
