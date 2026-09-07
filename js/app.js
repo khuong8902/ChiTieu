@@ -201,7 +201,7 @@ function updateTotal(){
 
     const p = Number(price.value)||0;
 
-    const q = Number(quantity.value)||0;
+    const q = Number(quantity.value)||1;
 
     const total = p*q;
 
@@ -400,7 +400,7 @@ btnSave.onclick=()=>{
 
         price:Number(price.value)||0,
 
-        qty:Number(quantity.value)||0,
+        qty:Number(quantity.value)||1,
 
         weight:Number(weight.value)||0
 
