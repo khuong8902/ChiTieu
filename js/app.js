@@ -312,7 +312,7 @@ function renderTable(){
 
         });
 
-        let lastTap = 0;
+let lastTap = 0;
 
 tr.addEventListener("click", () => {
 
