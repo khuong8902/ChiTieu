@@ -1,20 +1,23 @@
 :root{
     --blue:#2563EB;
+    --blue2:#3B82F6;
     --soft:#EAF7FF;
     --soft2:#DBEAFE;
     --border:#BFDBFE;
     --text:#1E293B;
+    --white:#FFFFFF;
 }
 
 *{
+    margin:0;
+    padding:0;
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
 }
 
 body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     background:var(--soft);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     color:var(--text);
 }
 
@@ -22,7 +25,7 @@ body{
     display:none !important;
 }
 
-/* ================= Splash ================= */
+/*================ Splash ================*/
 
 #splash{
     position:fixed;
@@ -37,22 +40,24 @@ body{
 }
 
 .logo{
-    font-size:60px;
     width:110px;
     height:110px;
+    border-radius:28px;
+    background:rgba(255,255,255,.18);
     display:flex;
     justify-content:center;
     align-items:center;
-    background:#ffffff30;
-    border-radius:28px;
+    font-size:56px;
+    backdrop-filter:blur(8px);
 }
 
 #splash h1{
-    margin-top:16px;
+    margin-top:18px;
     font-size:28px;
+    letter-spacing:.5px;
 }
 
-/* ================= Page ================= */
+/*================ Page ================*/
 
 .page{
     max-width:430px;
@@ -60,16 +65,17 @@ body{
     padding:18px;
 }
 
-.topbar{
+.topBar{
     display:flex;
     justify-content:space-between;
     align-items:center;
+    margin-bottom:16px;
 }
 
-.topbar h1{
-    margin:0;
+.topBar h1{
     font-size:28px;
     color:var(--blue);
+    font-weight:700;
 }
 
 .iconBtn{
@@ -78,42 +84,46 @@ body{
     border:none;
     border-radius:14px;
     background:var(--soft2);
-    font-size:20px;
+    color:var(--blue);
+    font-size:22px;
 }
 
-/* ================= Summary ================= */
+/*================ Summary ================*/
 
 .summary{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:10px;
-    margin:18px 0;
+    margin-bottom:14px;
 }
 
-.summaryBox{
-    background:white;
+.summaryCard{
+    background:var(--white);
     border-radius:18px;
     padding:14px;
+    box-shadow:0 2px 8px rgba(0,0,0,.04);
 }
 
-.summaryBox span{
+.summaryCard span{
     font-size:13px;
     color:#64748B;
 }
 
-.summaryBox h2{
-    margin:8px 0 0;
+.summaryCard strong{
+    display:block;
+    margin-top:8px;
+    font-size:22px;
     color:var(--blue);
-    font-size:24px;
 }
 
-/* ================= Input ================= */
+/*================ Input ================*/
 
 .field{
     position:relative;
 }
 
-input{
+input,
+select{
     width:100%;
     padding:13px;
     border-radius:16px;
@@ -123,30 +133,32 @@ input{
     margin-top:10px;
 }
 
-input:focus{
+input:focus,
+select:focus{
     outline:none;
     border-color:var(--blue);
 }
 
-/* Suggestions */
+/* Suggest */
 
 #suggestBox{
     position:absolute;
-    top:56px;
     left:0;
     right:0;
+    top:58px;
     background:white;
     border-radius:14px;
     overflow:hidden;
-    box-shadow:0 10px 24px rgba(0,0,0,.12);
     display:none;
-    z-index:99;
-    max-height:180px;
+    z-index:100;
+    box-shadow:0 10px 22px rgba(0,0,0,.12);
+    max-height:190px;
     overflow-y:auto;
 }
 
 .item{
     padding:12px;
+    cursor:pointer;
     border-bottom:1px solid #EEF2FF;
 }
 
@@ -155,28 +167,10 @@ input:focus{
 }
 
 .item:hover{
-    background:#F8FAFF;
+    background:#F7FBFF;
 }
 
-/* ================= Total ================= */
-
-.totalBox{
-    margin-top:10px;
-    padding:14px;
-    border-radius:16px;
-    background:var(--soft2);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-weight:bold;
-    color:var(--blue);
-}
-
-.totalBox strong{
-    font-size:20px;
-}
-
-/* ================= Weight ================= */
+/*================ Weight ================*/
 
 .row{
     display:grid;
@@ -192,21 +186,39 @@ input:focus{
     justify-content:center;
     align-items:center;
     color:var(--blue);
-    font-weight:bold;
+    font-weight:700;
 }
 
-/* ================= Button ================= */
+/*================ Total ================*/
 
-.primary{
-    margin-top:14px;
-    width:100%;
-    border:none;
-    background:var(--blue);
-    color:white;
+.totalBox{
+    margin-top:10px;
     padding:14px;
     border-radius:16px;
+    background:var(--soft2);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:var(--blue);
+    font-weight:700;
+}
+
+.totalBox strong{
+    font-size:22px;
+}
+
+/*================ Buttons ================*/
+
+.primary{
+    width:100%;
+    margin-top:14px;
+    padding:14px;
+    border:none;
+    border-radius:16px;
+    background:var(--blue);
+    color:white;
     font-size:17px;
-    font-weight:bold;
+    font-weight:700;
 }
 
 .toolRow{
@@ -222,10 +234,10 @@ input:focus{
     color:var(--blue);
     padding:13px;
     border-radius:16px;
-    font-weight:600;
+    font-weight:700;
 }
 
-/* ================= Table ================= */
+/*================ Table ================*/
 
 table{
     width:100%;
@@ -234,6 +246,7 @@ table{
     background:white;
     border-radius:18px;
     overflow:hidden;
+    box-shadow:0 2px 8px rgba(0,0,0,.04);
 }
 
 thead{
@@ -262,42 +275,19 @@ tbody tr:active{
     background:#F3F8FF;
 }
 
-/* ================= Statistic ================= */
+/*================ Statistic ================*/
 
-.currencySwitch{
+.pickerRow{
     display:flex;
-    justify-content:center;
+    align-items:center;
     gap:10px;
-    margin:15px 0;
+    margin:10px 0;
 }
 
-.currencyBtn{
-    border:none;
-    padding:10px 20px;
-    border-radius:22px;
-    background:var(--soft2);
-    color:var(--blue);
-    font-weight:bold;
-}
-
-.bottomTabs{
-    display:flex;
-    justify-content:space-around;
-    margin-top:18px;
-}
-
-.modeBtn{
-    border:none;
-    background:var(--soft2);
-    padding:10px 18px;
-    border-radius:22px;
-    color:var(--blue);
-    font-weight:bold;
-}
-
-.active{
-    background:var(--blue)!important;
-    color:white!important;
+.pickerRow label{
+    min-width:55px;
+    color:#64748B;
+    font-size:14px;
 }
 
 #lineChart{
@@ -305,9 +295,31 @@ tbody tr:active{
     background:white;
     border-radius:18px;
     margin-top:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.04);
 }
 
-/* ================= Modal ================= */
+.bottomTabs{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:16px;
+}
+
+.tab{
+    border:none;
+    background:var(--soft2);
+    color:var(--blue);
+    padding:12px;
+    border-radius:16px;
+    font-weight:700;
+}
+
+.tab.active{
+    background:var(--blue);
+    color:white;
+}
+
+/*================ Modal ================*/
 
 .modal{
     position:fixed;
@@ -327,19 +339,20 @@ tbody tr:active{
 }
 
 .dialog h3{
-    margin:0 0 14px;
     text-align:center;
+    margin-bottom:14px;
 }
 
 .settingCurrency,
 #btnCloseSetting{
     width:100%;
-    margin-top:10px;
     border:none;
-    padding:12px;
     border-radius:14px;
+    padding:12px;
+    margin-top:10px;
     background:var(--soft2);
     font-size:16px;
+    font-weight:600;
 }
 
 .settingCurrency.active{
