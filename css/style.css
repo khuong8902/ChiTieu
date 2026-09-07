@@ -1,120 +1,112 @@
-
 body{
 margin:0;
+font-family:-apple-system,sans-serif;
 background:#EAF7FF;
-font-family:-apple-system,BlinkMacSystemFont,sans-serif;
 }
 
-#splash{
-position:fixed;
-inset:0;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-background:linear-gradient(#7DD3FC,#2563EB);
-color:white;
-z-index:999;
-}
+.hidden{display:none}
 
-.logo{
-font-size:58px;
-background:#ffffff33;
-padding:20px;
-border-radius:22px;
-}
-
-.hidden{
-display:none;
-}
-
-main{
+.page{
 max-width:430px;
 margin:auto;
 padding:18px;
 }
 
-h2{
-color:#1D4ED8;
-margin-bottom:15px;
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
-input,select,button{
+header button{
+width:40px;
+height:40px;
+border:none;
+border-radius:12px;
+background:#DBEAFE;
+}
+
+.stats{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin:15px 0;
+}
+
+.box{
+background:white;
+border-radius:16px;
+padding:12px;
+}
+
+.field{position:relative}
+
+#suggestions{
+position:absolute;
+top:46px;
+left:0;
+right:0;
+background:white;
+border-radius:12px;
+display:none;
+box-shadow:0 8px 18px rgba(0,0,0,.08);
+z-index:99;
+max-height:180px;
+overflow:auto;
+}
+
+.item{
+padding:10px;
+border-bottom:1px solid #eee;
+}
+
+input,button{
 width:100%;
 padding:12px;
 font-size:16px;
 border-radius:14px;
 border:1px solid #BFDBFE;
 box-sizing:border-box;
-background:white;
+margin-top:10px;
 }
 
 .row{
 display:grid;
-grid-template-columns:1fr 70px;
+grid-template-columns:1fr 60px;
 gap:8px;
-margin-top:10px;
 }
 
-.unitbox{
+.unit{
+background:#DBEAFE;
 display:flex;
 justify-content:center;
 align-items:center;
-background:#DBEAFE;
-color:#1D4ED8;
-font-weight:bold;
 border-radius:14px;
+margin-top:10px;
+font-weight:bold;
+}
+
+.total{
+margin-top:10px;
+padding:12px;
+background:#DBEAFE;
+border-radius:14px;
+font-weight:bold;
+display:flex;
+justify-content:space-between;
 }
 
 #save{
-margin-top:14px;
 background:#2563EB;
 color:white;
-font-weight:bold;
 border:none;
 }
 
 .toolbar{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
 margin-top:10px;
-}
-
-.toolbtn{
-background:#2563EB;
-color:white;
-padding:12px;
-border-radius:14px;
-font-weight:bold;
-text-align:center;
-border:none;
-width:100%;
-}
-
-.field{
-position:relative;
-}
-
-#suggestions{
-position:absolute;
-left:0;
-right:0;
-top:48px;
-background:white;
-border-radius:12px;
-box-shadow:0 10px 20px rgba(0,0,0,.08);
-overflow:hidden;
-display:none;
-z-index:10;
-max-height:180px;
-overflow-y:auto;
-}
-
-.item{
-padding:10px;
-border-bottom:1px solid #EEF2FF;
-}
-
-.item:last-child{
-border-bottom:none;
 }
 
 table{
@@ -126,77 +118,75 @@ border-radius:14px;
 overflow:hidden;
 }
 
-th,td{
+td,th{
 padding:10px;
-border-bottom:1px solid #EEF2FF;
-text-align:left;
-}
-
-th{
-background:#F8FAFF;
+border-bottom:1px solid #eee;
 }
 
 tr{
-cursor:pointer;
+transition:.2s;
 }
 
-tr:hover{
-background:#F7FBFF;
-}
-
-#search{
-margin-top:12px;
-}
-/* ===== THỐNG KÊ ===== */
-
-.stats{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-bottom:14px;
-}
-
-.statbox{
-background:white;
-padding:12px;
-border-radius:16px;
-}
-
-.label{
-font-size:13px;
-color:#64748B;
-}
-
-.money{
-font-size:22px;
-font-weight:bold;
-color:#2563EB;
-margin-top:6px;
-}
-
-.currency{
-font-size:12px;
-color:#94A3B8;
-}
-
-/* ===== VUỐT XÓA ===== */
-
-tr{
-position:relative;
-transition:transform .2s;
-background:white;
-}
-
-.delete-bg{
-position:absolute;
-right:0;
-top:0;
-bottom:0;
-width:90px;
-background:#EF4444;
+.currencySwitch{
 display:flex;
-align-items:center;
 justify-content:center;
+gap:10px;
+margin:10px 0;
+}
+
+.cur,.tab{
+padding:10px 20px;
+border-radius:20px;
+border:none;
+background:#DBEAFE;
+}
+
+.active{
+background:#2563EB;
 color:white;
-font-weight:bold;
+}
+
+.bottomTabs{
+display:flex;
+justify-content:space-around;
+margin-top:15px;
+}
+
+canvas{
+width:100%;
+background:white;
+border-radius:16px;
+margin-top:10px;
+}
+
+.modal{
+position:fixed;
+inset:0;
+background:#0005;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.popup{
+width:260px;
+background:white;
+padding:20px;
+border-radius:18px;
+}
+
+#splash{
+position:fixed;
+inset:0;
+background:linear-gradient(#7DD3FC,#2563EB);
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+color:white;
+z-index:999;
+}
+
+.logo{
+font-size:56px;
 }
