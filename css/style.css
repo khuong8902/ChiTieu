@@ -363,3 +363,40 @@ tbody tr:active{
 #btnCloseSetting{
     background:#E5E7EB;
 }
+/* ===== Swipe Delete ===== */
+
+.swipeRow{
+    position:relative;
+    overflow:hidden;
+    width:100%;
+    height:52px;
+}
+
+.rowContent{
+    position:absolute;
+    inset:0;
+    background:#fff;
+    display:grid;
+    grid-template-columns:110px 1fr 90px;
+    align-items:center;
+    padding:0 12px;
+    transition:transform .22s ease;
+}
+
+.deleteBtn{
+    position:absolute;
+    right:0;
+    top:0;
+    width:88px;
+    height:52px;
+    background:#EF4444;
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:700;
+}
+
+.cell.money{
+    text-align:right;
+}
