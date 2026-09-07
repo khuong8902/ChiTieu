@@ -1,57 +1,56 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Chi Tiêu</title>
-
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/style.css">
-<meta name="theme-color" content="#2563EB">
 </head>
 
 <body>
 
 <div id="splash">
-    <div class="logo">💳</div>
-    <h1>Chi Tiêu</h1>
+  <div class="logo">💳</div>
+  <h1>Chi Tiêu</h1>
 </div>
 
-<main id="app" class="hidden">
+<!-- TRANG NHẬP LIỆU -->
+<main id="home" class="page hidden">
 
-<h2>Quản lý chi tiêu</h2>
-<div class="stats">
+<header>
+  <h1>Chi Tiêu</h1>
+  <button id="settingBtn">⚙</button>
+</header>
 
-  <div class="statbox">
-      <div class="label">Hôm nay</div>
-      <div id="todayTotal" class="money">0</div>
-      <div id="todayCurrency" class="currency">VND</div>
+<section class="stats">
+  <div class="box">
+      <small>Hôm nay</small>
+      <h2 id="todayValue">0</h2>
   </div>
-
-  <div class="statbox">
-      <div class="label">Tháng này</div>
-      <div id="monthTotal" class="money">0</div>
-      <div id="monthCurrency" class="currency">VND</div>
+  <div class="box">
+      <small>Tháng này</small>
+      <h2 id="monthValue">0</h2>
   </div>
+</section>
 
-</div>
 <div class="field">
-    <input id="name" placeholder="Tên sản phẩm" autocomplete="off">
-    <div id="suggestions"></div>
+  <input id="name" placeholder="Tên sản phẩm">
+  <div id="suggestions"></div>
+</div>
+
+<input id="price" type="number" placeholder="Giá">
+
+<input id="qty" type="number" value="1" min="1" placeholder="Số lượng">
+
+<div class="total">
+  Tổng tiền:
+  <span id="totalMoney">0</span>
 </div>
 
 <div class="row">
-    <input id="price" type="number" placeholder="Giá">
-    <select id="currency">
-        <option value="VND">VND</option>
-        <option value="JPY">JPY</option>
-    </select>
-</div>
-
-<div class="row">
-    <input id="weight" type="number" placeholder="Trọng lượng">
-    <div class="unitbox">g</div>
+  <input id="weight" type="number" placeholder="Trọng lượng">
+  <div class="unit">g</div>
 </div>
 
 <input id="date" type="date">
@@ -59,27 +58,62 @@
 <button id="save">ENTER</button>
 
 <div class="toolbar">
-    <button class="toolbtn" id="excel">
-        ⬇ Xuất File Excel
-    </button>
+  <button id="excel">Xuất Excel</button>
+  <button id="statBtn">Thống kê</button>
 </div>
 
-<input id="search" placeholder="🔍 Tìm sản phẩm">
+<input id="search" placeholder="Tìm sản phẩm">
 
 <table>
 <thead>
 <tr>
-    <th>Ngày</th>
-    <th>Tên</th>
-    <th>Giá</th>
+<th>Ngày</th>
+<th>Tên</th>
+<th>Tổng</th>
 </tr>
 </thead>
-
 <tbody id="rows"></tbody>
-
 </table>
 
 </main>
+
+<!-- TRANG THỐNG KÊ -->
+<main id="stat" class="page hidden">
+
+<header>
+  <button id="back">←</button>
+  <h1>Thống kê</h1>
+  <div style="width:32px"></div>
+</header>
+
+<div class="currencySwitch">
+  <button class="cur active" data-cur="JPY">JPY</button>
+  <button class="cur" data-cur="VND">VND</button>
+</div>
+
+<canvas id="chart" width="320" height="180"></canvas>
+
+<div class="bottomTabs">
+  <button class="tab active" data-mode="week">Tuần</button>
+  <button class="tab" data-mode="month">Tháng</button>
+  <button class="tab" data-mode="year">Năm</button>
+</div>
+
+</main>
+
+<!-- POPUP -->
+<div id="setting" class="modal hidden">
+
+<div class="popup">
+<h3>Cài đặt tiền tệ</h3>
+
+<button class="setCurrency" data-value="JPY">JPY</button>
+<button class="setCurrency" data-value="VND">VND</button>
+
+<button id="closeSetting">Đóng</button>
+</div>
+
+</div>
 
 <script src="js/app.js"></script>
 
