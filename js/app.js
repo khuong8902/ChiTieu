@@ -294,35 +294,44 @@ tr.innerHTML=`
 
         // Touch Delete
 
-        let startX=0;
+const rowContent = tr.querySelector(".rowContent");
+const deleteBtn = tr.querySelector(".deleteBtn");
 
-        tr.addEventListener("touchstart",(e)=>{
+let startX = 0;
+let lastTap = 0;
+let opened = false;
 
-            startX=e.touches[0].clientX;
+tr.addEventListener("touchstart",(e)=>{
 
-        });
+    startX = e.touches[0].clientX;
 
-       let lastTap = 0;
+});
 
 tr.addEventListener("touchend",(e)=>{
 
     const dx = e.changedTouches[0].clientX - startX;
 
-    // Vuốt trái để xóa
-    if(dx < -70){
+    // Vuốt trái mở nút Xóa
+    if(dx < -45){
 
-        if(confirm("Xóa khoản chi này?")){
-            expenseData.splice(index,1);
-            saveDB();
-            renderTable();
-            renderSummary();
-            drawChart();
-        }
-
+        rowContent.style.transform = "translateX(-88px)";
+        opened = true;
         return;
+
     }
 
-    // Chạm đúp để sửa
+    // Vuốt phải đóng lại
+    if(dx > 45){
+
+        rowContent.style.transform = "translateX(0)";
+        opened = false;
+        return;
+
+    }
+
+    // Nếu nút đỏ đang mở thì không sửa
+    if(opened) return;
+
     const now = Date.now();
 
     if(now - lastTap < 300){
@@ -330,6 +339,21 @@ tr.addEventListener("touchend",(e)=>{
     }
 
     lastTap = now;
+
+});
+
+// Bấm nút đỏ để xóa
+deleteBtn.addEventListener("click",()=>{
+
+    expenseData.splice(index,1);
+
+    saveDB();
+
+    renderTable();
+
+    renderSummary();
+
+    drawChart();
 
 });
 
