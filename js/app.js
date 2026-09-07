@@ -1,274 +1,425 @@
-
 document.addEventListener("DOMContentLoaded",()=>{
 
-const $=id=>document.getElementById(id);
-const today=()=>new Date().toISOString().slice(0,10);
+const $=id=>document.getElementById(id)
 
-const splash=$("splash");
-const app=$("app");
+const today=()=>new Date().toISOString().slice(0,10)
 
-const name=$("name");
-const price=$("price");
-const weight=$("weight");
-const currency=$("currency");
-const date=$("date");
+let settings=JSON.parse(localStorage.settings||'{"currency":"JPY"}')
 
-const search=$("search");
-const rows=$("rows");
-const suggestions=$("suggestions");
-const saveBtn=$("save");
+let names=JSON.parse(localStorage.names||
+'["Sữa","Trứng","Cà chua","Chuối","Cá hồi"]')
 
-let editIndex=-1;
+let data=JSON.parse(localStorage.data||"[]")
 
-let names=JSON.parse(
-localStorage.getItem("names")||
-'["Cá hồi","Cà chua","Cam","Chuối","Gạo","Sữa","Trứng","Thịt heo"]'
-);
+let edit=-1
 
-let data=JSON.parse(
-localStorage.getItem("expenses")||"[]"
-);
+date.value=today()
 
-date.value=today();
-
-currency.value=
-localStorage.getItem("lastCurrency")||"VND";
+//================== SAVE ==================
 
 function saveDB(){
 
-localStorage.setItem("names",JSON.stringify(names));
-localStorage.setItem("expenses",JSON.stringify(data));
-localStorage.setItem("lastCurrency",currency.value);
+localStorage.settings=JSON.stringify(settings)
+localStorage.names=JSON.stringify(names)
+localStorage.data=JSON.stringify(data)
 
 }
 
-function normalize(str){
+//================== NAME ==================
 
-return str
-.toLowerCase()
-.normalize("NFD")
-.replace(/[\u0300-\u036f]/g,"");
-
-}
-
-async function syncNameList(){
+async function syncName(){
 
 try{
 
-const res=await fetch("NameList.txt");
+const t=await (await fetch("NameList.txt")).text()
 
-const txt=await res.text();
+t.split(/\r?\n/)
+.filter(Boolean)
+.forEach(i=>{
+if(!names.includes(i)) names.push(i)
+})
 
-const fileNames=txt
-.split(/\r?\n/)
-.map(i=>i.trim())
-.filter(Boolean);
+saveDB()
 
-names=[...new Set([...names,...fileNames])].sort();
-
-saveDB();
-
-}catch(e){}
+}catch{}
 
 }
 
-function renderSuggestions(){
+function normalize(s){
 
-const q=normalize(name.value);
-
-suggestions.innerHTML="";
-
-if(q===""){
-suggestions.style.display="none";
-return;
-}
-
-const list=names.filter(i=>
-normalize(i).includes(q)
-);
-
-list.forEach(v=>{
-
-const div=document.createElement("div");
-div.className="item";
-div.textContent=v;
-
-div.onclick=()=>{
-
-name.value=v;
-suggestions.style.display="none";
-
-};
-
-suggestions.appendChild(div);
-
-});
-
-suggestions.style.display=list.length?"block":"none";
+return s.toLowerCase()
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g,"")
 
 }
 
-function renderTable(){
+name.oninput=()=>{
 
-const q=normalize(search.value);
+const q=normalize(name.value)
 
-rows.innerHTML="";
+suggestions.innerHTML=""
+
+if(!q){
+suggestions.style.display="none"
+return
+}
+
+names.filter(i=>normalize(i).includes(q))
+.forEach(v=>{
+
+const d=document.createElement("div")
+
+d.className="item"
+
+d.textContent=v
+
+d.onclick=()=>{
+name.value=v
+suggestions.style.display="none"
+}
+
+suggestions.appendChild(d)
+
+})
+
+suggestions.style.display="block"
+
+}
+
+//================ TOTAL ===================
+
+function calc(){
+
+const p=Number(price.value)||0
+const q=Number(qty.value)||1
+
+totalMoney.textContent=
+(p*q).toLocaleString()+" "+settings.currency
+
+}
+
+price.oninput=calc
+qty.oninput=calc
+
+//================ TABLE ===================
+
+function render(){
+
+rows.innerHTML=""
+
+const q=normalize(search.value)
 
 data
 .filter(i=>normalize(i.name).includes(q))
-.forEach(item=>{
+.forEach((r,i)=>{
 
-const index=data.indexOf(item);
-
-const tr=document.createElement("tr");
+const tr=document.createElement("tr")
 
 tr.innerHTML=`
-<td>${item.date}</td>
-<td>${item.name}</td>
-<td>${Number(item.price).toLocaleString()} ${item.currency}</td>`;
+<td>${r.date}</td>
+<td>${r.name}</td>
+<td>${Number(r.total).toLocaleString()}</td>`
 
-tr.onclick=()=>loadForEdit(index);
+let start=0
 
-rows.appendChild(tr);
+tr.ontouchstart=e=>start=e.touches[0].clientX
 
-});
+tr.ontouchend=e=>{
 
-}
+const dx=e.changedTouches[0].clientX-start
 
-function loadForEdit(index){
+if(dx<-70){
 
-const item=data[index];
+if(confirm("Xóa mục này?")){
 
-editIndex=index;
-
-name.value=item.name;
-price.value=item.price;
-weight.value=item.weight;
-currency.value=item.currency;
-date.value=item.date;
-
-saveBtn.textContent="CẬP NHẬT";
-
-window.scrollTo({
-top:0,
-behavior:"smooth"
-});
-
-}
-
-function clearForm(){
-
-name.value="";
-price.value="";
-weight.value="";
-date.value=today();
-
-editIndex=-1;
-
-saveBtn.textContent="ENTER";
-
-}
-
-name.addEventListener("input",renderSuggestions);
-
-search.addEventListener("input",renderTable);
-
-document.addEventListener("click",e=>{
-
-if(!e.target.closest(".field"))
-suggestions.style.display="none";
-
-});
-
-saveBtn.onclick=()=>{
-
-const obj={
-
-date:date.value,
-name:name.value.trim(),
-price:price.value||0,
-weight:weight.value||0,
-currency:currency.value
-
-};
-
-if(obj.name==="") return;
-
-if(editIndex==-1){
-
-data.unshift(obj);
-
-if(!names.includes(obj.name)){
-
-names.push(obj.name);
-names.sort();
+data.splice(i,1)
+saveDB()
+render()
+renderStat()
 
 }
 
 }else{
 
-data[editIndex]=obj;
+loadEdit(i)
 
 }
 
-saveDB();
+}
 
-clearForm();
+tr.onclick=()=>loadEdit(i)
 
-renderTable();
+rows.appendChild(tr)
 
-suggestions.style.display="none";
+})
 
-};
+}
 
-$("excel").onclick=()=>{
+function loadEdit(i){
 
-const table=[
-["Ngày nhập","Tên sản phẩm","Giá","Trọng lượng","Tiền tệ"]
-];
+const r=data[i]
+
+edit=i
+
+name.value=r.name
+price.value=r.price
+qty.value=r.qty
+weight.value=r.weight
+date.value=r.date
+
+calc()
+
+save.textContent="CẬP NHẬT"
+
+}
+
+//=============== SAVE =====================
+
+save.onclick=()=>{
+
+const obj={
+
+date:date.value,
+
+name:name.value,
+
+price:Number(price.value),
+
+qty:Number(qty.value),
+
+total:Number(price.value)*Number(qty.value),
+
+weight:Number(weight.value)
+
+}
+
+if(!obj.name) return
+
+if(edit==-1){
+
+data.unshift(obj)
+
+if(!names.includes(obj.name)) names.push(obj.name)
+
+}else{
+
+data[edit]=obj
+
+edit=-1
+
+save.textContent="ENTER"
+
+}
+
+saveDB()
+
+name.value=""
+price.value=""
+qty.value=1
+weight.value=""
+date.value=today()
+
+calc()
+
+render()
+
+renderStat()
+
+}
+
+//============== EXCEL =====================
+
+excel.onclick=()=>{
+
+const rowsData=[
+["Ngày nhập","Tên","Giá","Số lượng","Tổng tiền","Trọng lượng","Tiền tệ"]
+]
 
 data.forEach(i=>{
 
-table.push([
+rowsData.push([
 i.date,
 i.name,
 i.price,
+i.qty,
+i.total,
 i.weight,
-i.currency
-]);
+settings.currency
+])
 
-});
+})
 
-const csv=table.map(r=>r.join(",")).join("\n");
+const csv=rowsData.map(r=>r.join(",")).join("\n")
 
-const blob=new Blob(
-["\ufeff"+csv],
-{type:"text/csv;charset=utf-8;"}
-);
+const blob=new Blob(["\ufeff"+csv],{type:"text/csv"})
 
-const a=document.createElement("a");
+const a=document.createElement("a")
 
-a.href=URL.createObjectURL(blob);
+a.href=URL.createObjectURL(blob)
 
-a.download="DuLieuChiTieu.csv";
+a.download="DuLieuChiTieu.csv"
 
-a.click();
+a.click()
 
-};
+}
 
-(async()=>{
+//============ STAT =======================
 
-await syncNameList();
+function renderStat(){
 
-renderTable();
+const now=new Date()
+
+const t=today()
+
+const m=t.slice(0,7)
+
+let td=0,th=0
+
+data.forEach(i=>{
+
+if(i.date==t) td+=i.total
+
+if(i.date.startsWith(m)) th+=i.total
+
+})
+
+todayValue.textContent=td.toLocaleString()+" "+settings.currency
+
+monthValue.textContent=th.toLocaleString()+" "+settings.currency
+
+drawChart("week")
+
+}
+
+let currentCur="JPY"
+
+document.querySelectorAll(".cur").forEach(b=>{
+
+b.onclick=()=>{
+
+document.querySelectorAll(".cur").forEach(i=>i.classList.remove("active"))
+
+b.classList.add("active")
+
+currentCur=b.dataset.cur
+
+drawChart(document.querySelector(".tab.active").dataset.mode)
+
+}
+
+})
+
+document.querySelectorAll(".tab").forEach(b=>{
+
+b.onclick=()=>{
+
+document.querySelectorAll(".tab").forEach(i=>i.classList.remove("active"))
+
+b.classList.add("active")
+
+drawChart(b.dataset.mode)
+
+}
+
+})
+
+function drawChart(mode){
+
+const c=chart.getContext("2d")
+
+c.clearRect(0,0,320,180)
+
+c.strokeStyle="#2563EB"
+c.lineWidth=3
+
+let arr=[]
+
+if(mode=="week") arr=[1200,800,1600,900,1800,1400,2200]
+if(mode=="month") arr=[3500,5200,4800,6300]
+if(mode=="year") arr=[4,6,5,8,7,9,10,11,9,12,13,15].map(i=>i*1000)
+
+const max=Math.max(...arr)
+
+c.beginPath()
+
+arr.forEach((v,i)=>{
+
+const x=30+i*(260/(arr.length-1))
+
+const y=150-(v/max)*110
+
+if(i==0) c.moveTo(x,y)
+else c.lineTo(x,y)
+
+c.fillStyle="#2563EB"
+c.beginPath()
+c.arc(x,y,4,0,6.28)
+c.fill()
+
+})
+
+c.stroke()
+
+}
+
+//============ PAGE =======================
+
+statBtn.onclick=()=>{
+
+home.classList.add("hidden")
+stat.classList.remove("hidden")
+
+drawChart("week")
+
+}
+
+back.onclick=()=>{
+
+stat.classList.add("hidden")
+home.classList.remove("hidden")
+
+}
+
+settingBtn.onclick=()=>setting.classList.remove("hidden")
+
+closeSetting.onclick=()=>setting.classList.add("hidden")
+
+document.querySelectorAll(".setCurrency").forEach(b=>{
+
+b.onclick=()=>{
+
+settings.currency=b.dataset.value
+
+saveDB()
+
+renderStat()
+
+calc()
+
+setting.classList.add("hidden")
+
+}
+
+})
+
+search.oninput=render
+
+//=========== START =======================
+
+syncName()
+
+calc()
+
+render()
+
+renderStat()
 
 setTimeout(()=>{
 
-splash.style.display="none";
-app.classList.remove("hidden");
+splash.style.display="none"
 
-},600);
+home.classList.remove("hidden")
 
-})();
+},600)
 
-});
+})
