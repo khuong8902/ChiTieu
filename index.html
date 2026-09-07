@@ -4,39 +4,272 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Chi Tiêu</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="css/style.css">
+
+<style>
+:root{
+ --blue:#2563EB;
+ --soft:#EAF7FF;
+ --card:#ffffff;
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+background:var(--soft);
+}
+
+.hidden{display:none!important}
+
+.page{
+max-width:430px;
+margin:auto;
+padding:18px;
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.iconbtn{
+width:40px;
+height:40px;
+border:none;
+border-radius:12px;
+background:#DBEAFE;
+font-size:20px;
+}
+
+.stats{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin:15px 0;
+}
+
+.box{
+background:white;
+padding:12px;
+border-radius:16px;
+}
+
+.box small{color:#64748B}
+
+.box h2{
+margin:8px 0 0;
+font-size:22px;
+color:var(--blue);
+}
+
+input,button{
+width:100%;
+padding:12px;
+font-size:16px;
+border-radius:14px;
+border:1px solid #BFDBFE;
+margin-top:10px;
+}
+
+.field{position:relative}
+
+#suggest{
+position:absolute;
+left:0;
+right:0;
+top:48px;
+background:white;
+border-radius:12px;
+box-shadow:0 8px 18px rgba(0,0,0,.1);
+max-height:180px;
+overflow:auto;
+display:none;
+z-index:9;
+}
+
+.item{
+padding:10px;
+border-bottom:1px solid #eee;
+}
+
+.total{
+margin-top:10px;
+background:#DBEAFE;
+padding:12px;
+border-radius:14px;
+display:flex;
+justify-content:space-between;
+font-weight:bold;
+color:var(--blue);
+}
+
+.row{
+display:grid;
+grid-template-columns:1fr 60px;
+gap:8px;
+}
+
+.unit{
+margin-top:10px;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#DBEAFE;
+border-radius:14px;
+font-weight:bold;
+color:var(--blue);
+}
+
+#save{
+background:var(--blue);
+color:white;
+border:none;
+}
+
+.toolbar{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:10px;
+}
+
+.toolbar button{
+background:#DBEAFE;
+color:var(--blue);
+border:none;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:12px;
+background:white;
+border-radius:14px;
+overflow:hidden;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #eee;
+}
+
+tr{
+transition:.2s;
+touch-action:pan-y;
+}
+
+canvas{
+width:100%;
+background:white;
+border-radius:16px;
+margin-top:12px;
+}
+
+.switch{
+display:flex;
+gap:8px;
+justify-content:center;
+margin:12px 0;
+}
+
+.switch button{
+width:auto;
+padding:8px 18px;
+border:none;
+background:#DBEAFE;
+border-radius:20px;
+}
+
+.active{
+background:var(--blue)!important;
+color:white!important;
+}
+
+.bottom{
+display:flex;
+justify-content:space-around;
+margin-top:15px;
+}
+
+.bottom button{
+width:auto;
+padding:8px 20px;
+border:none;
+background:#DBEAFE;
+border-radius:20px;
+}
+
+.modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.35);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:999;
+}
+
+.popup{
+width:260px;
+background:white;
+padding:18px;
+border-radius:18px;
+}
+
+.popup h3{
+margin:0 0 10px;
+text-align:center;
+}
+
+#splash{
+position:fixed;
+inset:0;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+background:linear-gradient(#7DD3FC,#2563EB);
+color:white;
+z-index:1000;
+}
+
+.logo{
+font-size:58px;
+}
+</style>
 </head>
 
 <body>
 
 <div id="splash">
-  <div class="logo">💳</div>
-  <h1>Chi Tiêu</h1>
+<div class="logo">💳</div>
+<h1>Chi Tiêu</h1>
 </div>
 
-<!-- TRANG NHẬP LIỆU -->
-<main id="home" class="page hidden">
+<!-- HOME -->
+<div id="home" class="page hidden">
 
 <header>
-  <h1>Chi Tiêu</h1>
-  <button id="settingBtn">⚙</button>
+<h2>Chi Tiêu</h2>
+<button id="gear" class="iconbtn">⚙</button>
 </header>
 
-<section class="stats">
-  <div class="box">
-      <small>Hôm nay</small>
-      <h2 id="todayValue">0</h2>
-  </div>
-  <div class="box">
-      <small>Tháng này</small>
-      <h2 id="monthValue">0</h2>
-  </div>
-</section>
+<div class="stats">
+<div class="box">
+<small>Hôm nay</small>
+<h2 id="today">0</h2>
+</div>
+<div class="box">
+<small>Tháng này</small>
+<h2 id="month">0</h2>
+</div>
+</div>
 
 <div class="field">
-  <input id="name" placeholder="Tên sản phẩm">
-  <div id="suggestions"></div>
+<input id="name" placeholder="Tên sản phẩm" autocomplete="off">
+<div id="suggest"></div>
 </div>
 
 <input id="price" type="number" placeholder="Giá">
@@ -44,13 +277,13 @@
 <input id="qty" type="number" value="1" min="1" placeholder="Số lượng">
 
 <div class="total">
-  Tổng tiền:
-  <span id="totalMoney">0</span>
+<span>Tổng tiền</span>
+<span id="sum">0</span>
 </div>
 
 <div class="row">
-  <input id="weight" type="number" placeholder="Trọng lượng">
-  <div class="unit">g</div>
+<input id="weight" type="number" placeholder="Trọng lượng">
+<div class="unit">g</div>
 </div>
 
 <input id="date" type="date">
@@ -58,8 +291,8 @@
 <button id="save">ENTER</button>
 
 <div class="toolbar">
-  <button id="excel">Xuất Excel</button>
-  <button id="statBtn">Thống kê</button>
+<button id="excel">Xuất Excel</button>
+<button id="openStat">Thống kê</button>
 </div>
 
 <input id="search" placeholder="Tìm sản phẩm">
@@ -75,47 +308,550 @@
 <tbody id="rows"></tbody>
 </table>
 
-</main>
+</div>
 
-<!-- TRANG THỐNG KÊ -->
-<main id="stat" class="page hidden">
+<!-- STAT -->
+<div id="stat" class="page hidden">
 
 <header>
-  <button id="back">←</button>
-  <h1>Thống kê</h1>
-  <div style="width:32px"></div>
+<button id="back" class="iconbtn">←</button>
+<h2>Thống kê</h2>
+<div style="width:40px"></div>
 </header>
 
-<div class="currencySwitch">
-  <button class="cur active" data-cur="JPY">JPY</button>
-  <button class="cur" data-cur="VND">VND</button>
+<div class="switch">
+<button class="cur active" data-cur="JPY">JPY</button>
+<button class="cur" data-cur="VND">VND</button>
 </div>
 
 <canvas id="chart" width="320" height="180"></canvas>
 
-<div class="bottomTabs">
-  <button class="tab active" data-mode="week">Tuần</button>
-  <button class="tab" data-mode="month">Tháng</button>
-  <button class="tab" data-mode="year">Năm</button>
+<div class="bottom">
+<button class="mode active" data-mode="week">Tuần</button>
+<button class="mode" data-mode="month">Tháng</button>
+<button class="mode" data-mode="year">Năm</button>
 </div>
 
-</main>
+</div>
 
-<!-- POPUP -->
+<!-- SETTING -->
 <div id="setting" class="modal hidden">
 
 <div class="popup">
-<h3>Cài đặt tiền tệ</h3>
 
-<button class="setCurrency" data-value="JPY">JPY</button>
-<button class="setCurrency" data-value="VND">VND</button>
+<h3>Tiền tệ mặc định</h3>
 
-<button id="closeSetting">Đóng</button>
+<button class="set active" data-v="JPY">JPY</button>
+
+<button class="set" data-v="VND">VND</button>
+
+<button id="close">Đóng</button>
+
 </div>
 
 </div>
 
-<script src="js/app.js"></script>
+<script>
+const $=id=>document.getElementById(id)
+
+const today=()=>new Date().toISOString().slice(0,10)
+
+let setting=JSON.parse(localStorage.setting||'{"currency":"JPY"}')
+
+let names=JSON.parse(localStorage.names||
+'["Sữa","Trứng","Chuối","Cà chua","Cá hồi"]')
+
+let data=JSON.parse(localStorage.data||"[]")
+
+let edit=-1
+
+date.value=today()
+
+//================== LOAD NAMELIST ==================
+
+fetch("NameList.txt")
+.then(r=>r.text())
+.then(t=>{
+
+t.split(/\\r?\\n/)
+.filter(Boolean)
+.forEach(i=>{
+if(!names.includes(i)) names.push(i)
+})
+
+saveDB()
+
+}).catch(()=>{})
+
+//================== SAVE ==================
+
+function saveDB(){
+
+localStorage.setting=JSON.stringify(setting)
+localStorage.names=JSON.stringify(names)
+localStorage.data=JSON.stringify(data)
+
+}
+
+//================== NORMALIZE ==================
+
+function norm(s){
+
+return s.toLowerCase()
+.normalize("NFD")
+.replace(/[\\u0300-\\u036f]/g,"")
+
+}
+
+//================== GỢI Ý ==================
+
+name.oninput=()=>{
+
+const q=norm(name.value)
+
+suggest.innerHTML=""
+
+if(!q){
+suggest.style.display="none"
+return
+}
+
+names.filter(i=>norm(i).includes(q))
+.forEach(v=>{
+
+const d=document.createElement("div")
+
+d.className="item"
+
+d.textContent=v
+
+d.onclick=()=>{
+name.value=v
+suggest.style.display="none"
+}
+
+suggest.appendChild(d)
+
+})
+
+suggest.style.display="block"
+
+}
+
+//================== TÍNH TỔNG ==================
+
+function calc(){
+
+const p=Number(price.value)||0
+const q=Number(qty.value)||1
+
+sum.textContent=(p*q).toLocaleString()+" "+setting.currency
+
+}
+
+price.oninput=calc
+qty.oninput=calc
+
+//================== BẢNG ==================
+
+search.oninput=render
+
+function render(){
+
+rows.innerHTML=""
+
+const q=norm(search.value)
+
+data
+.filter(i=>norm(i.name).includes(q))
+.forEach((r,i)=>{
+
+const tr=document.createElement("tr")
+
+tr.innerHTML=`
+<td>${r.date}</td>
+<td>${r.name}</td>
+<td>${r.total.toLocaleString()}</td>`
+
+let start=0
+
+tr.ontouchstart=e=>start=e.touches[0].clientX
+
+tr.ontouchend=e=>{
+
+const dx=e.changedTouches[0].clientX-start
+
+if(dx<-70){
+
+if(confirm("Xóa mục này?")){
+
+data.splice(i,1)
+
+saveDB()
+
+render()
+
+renderStat()
+
+}
+
+}else{
+
+loadEdit(i)
+
+}
+
+}
+
+tr.onclick=()=>loadEdit(i)
+
+rows.appendChild(tr)
+
+})
+
+}
+
+function loadEdit(i){
+
+const r=data[i]
+
+edit=i
+
+name.value=r.name
+price.value=r.price
+qty.value=r.qty
+weight.value=r.weight
+date.value=r.date
+
+calc()
+
+save.textContent="CẬP NHẬT"
+
+window.scrollTo({top:0,behavior:"smooth"})
+
+}
+
+//================== LƯU ==================
+
+save.onclick=()=>{
+
+if(!name.value.trim()) return
+
+const obj={
+
+date:date.value,
+
+name:name.value.trim(),
+
+price:Number(price.value),
+
+qty:Number(qty.value),
+
+total:Number(price.value)*Number(qty.value),
+
+weight:Number(weight.value)
+
+}
+
+if(edit==-1){
+
+data.unshift(obj)
+
+if(!names.includes(obj.name))
+names.push(obj.name)
+
+}else{
+
+data[edit]=obj
+
+edit=-1
+
+save.textContent="ENTER"
+
+}
+
+saveDB()
+
+name.value=""
+price.value=""
+qty.value=1
+weight.value=""
+date.value=today()
+
+calc()
+
+render()
+
+renderStat()
+
+}
+
+//================== EXCEL ==================
+
+excel.onclick=()=>{
+
+let csv="Ngày,Tên,Giá,Số lượng,Tổng tiền,Trọng lượng,Tiền tệ\\n"
+
+data.forEach(i=>{
+
+csv+=`${i.date},${i.name},${i.price},${i.qty},${i.total},${i.weight},${setting.currency}\\n`
+
+})
+
+const blob=new Blob(["\\ufeff"+csv],{type:"text/csv"})
+
+const a=document.createElement("a")
+
+a.href=URL.createObjectURL(blob)
+
+a.download="DuLieuChiTieu.csv"
+
+a.click()
+
+}
+
+//================== STAT ==================
+
+let currentMode="week"
+
+document.querySelectorAll(".mode").forEach(b=>{
+
+b.onclick=()=>{
+
+document.querySelectorAll(".mode").forEach(i=>i.classList.remove("active"))
+
+b.classList.add("active")
+
+currentMode=b.dataset.mode
+
+draw()
+
+}
+
+})
+
+document.querySelectorAll(".cur").forEach(b=>{
+
+b.onclick=()=>{
+
+document.querySelectorAll(".cur").forEach(i=>i.classList.remove("active"))
+
+b.classList.add("active")
+
+draw()
+
+}
+
+})
+
+function renderStat(){
+
+const t=today()
+
+const m=t.slice(0,7)
+
+let td=0
+let mt=0
+
+data.forEach(i=>{
+
+if(i.date==t) td+=i.total
+
+if(i.date.startsWith(m)) mt+=i.total
+
+})
+
+today.textContent=td.toLocaleString()+" "+setting.currency
+
+month.textContent=mt.toLocaleString()+" "+setting.currency
+
+draw()
+
+}
+
+function draw(){
+
+const c=chart.getContext("2d")
+
+c.clearRect(0,0,320,180)
+
+let arr=[]
+
+const now=new Date()
+
+if(currentMode=="week"){
+
+arr=new Array(7).fill(0)
+
+data.forEach(i=>{
+
+const d=new Date(i.date)
+
+const day=(d.getDay()+6)%7
+
+arr[day]+=i.total
+
+})
+
+}
+
+if(currentMode=="month"){
+
+arr=[0,0,0,0,0]
+
+data.forEach(i=>{
+
+const d=new Date(i.date)
+
+if(d.getMonth()==now.getMonth()){
+
+const w=Math.min(4,Math.floor((d.getDate()-1)/7))
+
+arr[w]+=i.total
+
+}
+
+})
+
+}
+
+if(currentMode=="year"){
+
+arr=new Array(12).fill(0)
+
+data.forEach(i=>{
+
+const d=new Date(i.date)
+
+if(d.getFullYear()==now.getFullYear()){
+
+arr[d.getMonth()]+=i.total
+
+}
+
+})
+
+}
+
+const max=Math.max(...arr,1)
+
+c.strokeStyle="#2563EB"
+c.lineWidth=3
+
+c.beginPath()
+
+arr.forEach((v,i)=>{
+
+const x=30+i*(260/(arr.length-1))
+
+const y=150-(v/max)*110
+
+if(i==0)c.moveTo(x,y)
+else c.lineTo(x,y)
+
+})
+
+c.stroke()
+
+arr.forEach((v,i)=>{
+
+const x=30+i*(260/(arr.length-1))
+
+const y=150-(v/max)*110
+
+c.fillStyle="#2563EB"
+
+c.beginPath()
+
+c.arc(x,y,4,0,6.28)
+
+c.fill()
+
+})
+
+}
+
+//================== SETTING ==================
+
+gear.onclick=()=>{
+
+setting.classList.remove("hidden")
+
+}
+
+close.onclick=()=>{
+
+setting.classList.add("hidden")
+
+}
+
+setting.onclick=e=>{
+
+if(e.target==setting)
+
+setting.classList.add("hidden")
+
+}
+
+document.querySelectorAll(".set").forEach(b=>{
+
+if(b.dataset.v==setting.currency)
+b.classList.add("active")
+
+b.onclick=()=>{
+
+document.querySelectorAll(".set").forEach(i=>i.classList.remove("active"))
+
+b.classList.add("active")
+
+setting.currency=b.dataset.v
+
+saveDB()
+
+calc()
+
+renderStat()
+
+}
+
+})
+
+//================== PAGE ==================
+
+openStat.onclick=()=>{
+
+home.classList.add("hidden")
+
+stat.classList.remove("hidden")
+
+draw()
+
+}
+
+back.onclick=()=>{
+
+stat.classList.add("hidden")
+
+home.classList.remove("hidden")
+
+}
+
+//================== START ==================
+
+calc()
+
+render()
+
+renderStat()
+
+setTimeout(()=>{
+
+splash.style.display="none"
+
+home.classList.remove("hidden")
+
+},500)
+</script>
 
 </body>
 </html>
