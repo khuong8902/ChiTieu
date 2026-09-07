@@ -268,11 +268,29 @@ function renderTable(){
 
         const tr=document.createElement("tr");
 
-        tr.innerHTML=`
-            <td>${item.date}</td>
-            <td>${item.name}</td>
-            <td>${format(item.total)}</td>
-        `;
+tr.innerHTML=`
+<td colspan="3" style="padding:0;border:none">
+
+<div class="swipeRow">
+
+    <div class="deleteBtn">
+        🗑 Xóa
+    </div>
+
+    <div class="rowContent">
+
+        <div class="cell date">${item.date}</div>
+
+        <div class="cell name">${item.name}</div>
+
+        <div class="cell money">${format(item.total)}</div>
+
+    </div>
+
+</div>
+
+</td>
+`;
 
         // Touch Delete
 
