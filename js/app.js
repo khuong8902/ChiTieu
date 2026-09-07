@@ -284,49 +284,38 @@ function renderTable(){
 
         });
 
-        tr.addEventListener("touchend",(e)=>{
+       let lastTap = 0;
 
-            const dx=e.changedTouches[0].clientX-startX;
+tr.addEventListener("touchend",(e)=>{
 
-            if(dx<-70){
+    const dx = e.changedTouches[0].clientX - startX;
 
-                if(confirm("Xóa khoản chi này?")){
+    // Vuốt trái để xóa
+    if(dx < -70){
 
-                    expenseData.splice(index,1);
+        if(confirm("Xóa khoản chi này?")){
+            expenseData.splice(index,1);
+            saveDB();
+            renderTable();
+            renderSummary();
+            drawChart();
+        }
 
-                    saveDB();
+        return;
+    }
 
-                    renderTable();
-
-                    renderSummary();
-
-                    drawChart();
-
-                }
-
-            }else{
-
-                loadEdit(index);
-
-            }
-
-        });
-
-let lastTap = 0;
-
-tr.addEventListener("click", () => {
-
+    // Chạm đúp để sửa
     const now = Date.now();
 
-    if (now - lastTap < 300) {
-
+    if(now - lastTap < 300){
         loadEdit(index);
-
     }
 
     lastTap = now;
 
 });
+
+
 
         tableBody.appendChild(tr);
 
