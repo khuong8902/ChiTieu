@@ -380,9 +380,23 @@ home.classList.remove("hidden")
 
 }
 
-settingBtn.onclick=()=>setting.classList.remove("hidden")
+const settingModal = $("setting");
+const closeSetting = $("closeSetting");
 
-closeSetting.onclick=()=>setting.classList.add("hidden")
+settingBtn.onclick = () => {
+    settingModal.classList.remove("hidden");
+};
+
+closeSetting.onclick = () => {
+    settingModal.classList.add("hidden");
+};
+
+/* Bấm ra vùng tối cũng đóng popup */
+settingModal.addEventListener("click",(e)=>{
+    if(e.target===settingModal){
+        settingModal.classList.add("hidden");
+    }
+});
 
 document.querySelectorAll(".setCurrency").forEach(b=>{
 
