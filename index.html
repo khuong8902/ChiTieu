@@ -1,18 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-  <title>Tiêu Dùng</title>
+  <title>Chi Tiêu</title>
 
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-
-  <meta name="theme-color" content="#2563EB">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#DCEFFF">
 
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -20,44 +16,40 @@
 <body>
 
 <!-- Splash -->
-<div id="splash">
-  <div class="logo">💳</div>
-  <h1>Tiêu Dùng</h1>
+<div id="splash" class="splash">
+  <img src="icons/icon-192.png" class="splashIcon">
+  <div class="splashText">Chi Tiêu</div>
 </div>
 
 <!-- ================= TRANG NHẬP LIỆU ================= -->
-<main id="homePage" class="page hidden">
+<div id="homePage" class="page">
 
- <header class="topBar">
-
-    <input
-        id="inputDate"
-        type="date"
-        class="dateTop">
+  <!-- Header -->
+  <div class="topBar">
+    <input id="inputDate" type="date" class="dateTop">
 
     <button id="btnSetting" class="iconBtn">
-        ⚙
+      ⚙
     </button>
+  </div>
 
-</header>
-
-  <!-- Thống kê nhanh -->
-  <section class="summary">
+  <!-- Tổng -->
+  <div class="summaryGrid">
 
     <div class="summaryCard">
-      <span>Hôm nay</span>
-      <strong id="todayTotal">0</strong>
+      <div class="summaryTitle">Hôm nay</div>
+      <div id="todayTotal" class="summaryValue">0</div>
     </div>
 
     <div class="summaryCard">
-      <span>Tháng này</span>
-      <strong id="monthTotal">0</strong>
+      <div class="summaryTitle">Tháng này</div>
+      <div id="monthTotal" class="summaryValue">0</div>
     </div>
 
-  </section>
+  </div>
 
   <!-- Tên -->
-  <div class="field">
+  <div class="fieldWrap">
 
     <input
       id="productName"
@@ -65,7 +57,7 @@
       placeholder="Tên sản phẩm"
       autocomplete="off">
 
-    <div id="suggestBox"></div>
+    <div id="suggestBox" class="suggestBox"></div>
 
   </div>
 
@@ -75,117 +67,199 @@
     type="number"
     placeholder="Giá">
 
-  <!-- Số lượng -->
+  <!-- SL -->
   <input
     id="quantity"
     type="number"
     placeholder="Số lượng">
 
   <!-- Trọng lượng -->
-  <div class="row">
+  <div class="weightRow">
 
     <input
       id="weight"
       type="number"
       placeholder="Trọng lượng">
 
-    <div class="unit">
-      g
-    </div>
+    <div class="unitBox">g</div>
 
   </div>
 
- 
   <!-- Enter -->
-  <button id="btnSave" class="primary">
+  <button id="btnSave" class="enterBtn">
     ENTER
   </button>
 
   <!-- Tổng tiền -->
   <div class="totalBox">
+
     <span>Tổng tiền</span>
-    <strong id="totalPrice">0</strong>
+
+    <strong id="totalPrice">0 JPY</strong>
+
   </div>
-  
+
   <!-- Công cụ -->
   <div class="toolRow">
 
-    <button id="btnExcel">
+    <button id="btnExcel" class="toolBtn">
       📄 Xuất Excel
     </button>
 
-    <button id="btnStatistic">
+    <button id="btnStatistic" class="toolBtn">
       📊 Thống kê
     </button>
 
   </div>
 
-  <!-- Tìm -->
+  <!-- Search -->
   <input
     id="search"
     type="text"
-    placeholder="🔍 Tìm sản phẩm">
+    placeholder="Tìm sản phẩm...">
 
-  <!-- Bảng -->
-  <table>
+  <!-- Danh sách -->
+  <div class="listArea">
 
-    <thead>
-      <tr>
-        <th>Ngày</th>
-        <th>Tên</th>
-        <th>Tổng</th>
-      </tr>
-    </thead>
+    <table>
 
-    <tbody id="tableBody"></tbody>
+      <thead>
 
-  </table>
+        <tr>
 
-</main>
+          <th style="width:34%">Ngày</th>
+
+          <th>Tên</th>
+
+          <th style="width:24%">Tiền</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody id="tableBody"></tbody>
+
+    </table>
+
+  </div>
+
+</div>
 
 <!-- ================= THỐNG KÊ ================= -->
-<main id="statPage" class="page hidden">
+<div id="statPage" class="page hidden">
 
-  <header class="topBar">
+  <!-- Header -->
+  <div class="topBar">
 
     <button id="btnBack" class="iconBtn">
       ←
     </button>
 
-    <h1>Thống kê</h1>
+    <div class="pageTitle">
+      Thống kê
+    </div>
 
     <div style="width:42px"></div>
 
-  </header>
+  </div>
 
-  <!-- Chọn tháng -->
-  <div id="monthPanel" class="pickerRow">
+  <!-- 3 ô thống kê -->
+  <div class="statGrid">
 
-    <label>Tháng</label>
+    <div class="statCard">
 
-    <input
-      id="monthPicker"
-      type="month">
+      <div class="statLabel">Tổng chi</div>
+
+      <div id="statTotal" class="statValue red">
+        0
+      </div>
+
+    </div>
+
+    <div class="statCard">
+
+      <div class="statLabel">Lượt mua</div>
+
+      <div id="statCount" class="statValue blue">
+        0
+      </div>
+
+    </div>
+
+    <div class="statCard">
+
+      <div class="statLabel">TB/ngày</div>
+
+      <div id="statAvg" class="statValue green">
+        0
+      </div>
+
+    </div>
 
   </div>
 
-  <!-- Chọn năm -->
-  <div id="yearPanel" class="pickerRow hidden">
+  <!-- Theo tháng -->
+  <div id="monthPanel" class="pickerBar">
 
-    <label>Năm</label>
+    <span>Tháng</span>
+
+    <input id="monthPicker" type="month">
+
+  </div>
+
+  <!-- Theo năm -->
+  <div id="yearPanel" class="pickerBar hidden">
+
+    <span>Năm</span>
 
     <select id="yearPicker"></select>
 
   </div>
 
-  <!-- Line Chart -->
-  <canvas
-    id="lineChart"
-    width="360"
-    height="220">
-  </canvas>
+  <!-- Biểu đồ tháng -->
+  <div id="monthChart" class="monthChart">
 
-  <!-- Tabs -->
+    <div id="leftBars" class="barColumn"></div>
+
+    <div id="rightBars" class="barColumn"></div>
+
+  </div>
+
+  <!-- Biểu đồ năm -->
+  <div id="yearChart" class="yearChart hidden"></div>
+
+  <!-- Chi tiết -->
+  <div id="detailPanel" class="detailPanel hidden">
+
+    <div class="detailHeader">
+
+      <div>
+
+        <div id="detailDate" class="detailDate">
+          18/09/2026
+        </div>
+
+        <div id="detailInfo" class="detailInfo">
+          4 lượt mua • 3 sản phẩm
+        </div>
+
+      </div>
+
+      <div id="detailTotal" class="detailMoney">
+        ¥0
+      </div>
+
+    </div>
+
+    <div id="detailList" class="detailList">
+
+      <!-- JS render -->
+
+    </div>
+
+  </div>
+
+  <!-- Bottom -->
   <div class="bottomTabs">
 
     <button
@@ -202,25 +276,25 @@
 
   </div>
 
-</main>
+</div>
 
 <!-- ================= CÀI ĐẶT ================= -->
 <div id="settingModal" class="modal hidden">
 
   <div class="dialog">
 
-    <h3>Tiền tệ mặc định</h3>
+    <h3>Cài đặt tiền tệ</h3>
 
     <button
       class="settingCurrency"
       data-value="JPY">
-      🇯🇵 JPY
+      JPY
     </button>
 
     <button
       class="settingCurrency"
       data-value="VND">
-      🇻🇳 VND
+      VND
     </button>
 
     <button id="btnCloseSetting">
@@ -231,10 +305,7 @@
 
 </div>
 
-<!-- SheetJS -->
 <script src="lib/xlsx.full.min.js"></script>
-
-<!-- App -->
 <script src="js/app.js"></script>
 
 </body>
