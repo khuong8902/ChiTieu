@@ -405,21 +405,18 @@ function loadEdit(index){
 
 function clearForm(){
 
-    productName.value="";
+productName.value="";
+price.value="";
+quantity.value="";
+weight.value="";
+inputDate.value=today();
 
-    price.value="";
+editIndex=-1;
 
-    quantity.value="";
+btnSave.textContent="ENTER";
 
-    weight.value="";
+updateTotal();
 
-    inputDate.value=today();
-
-    editIndex=-1;
-
-    btnSave.textContent="ENTER";
-
-    updateTotal();
 // Tự đưa con trỏ về ô Tên sản phẩm
 setTimeout(()=>{
     productName.focus();
