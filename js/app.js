@@ -308,11 +308,11 @@ function loadEdit(index){
 
     editIndex=index;
 
-    productName.value=r.name;
-    price.value=r.price;
-    quantity.value=r.qty||"";
-    weight.value=r.weight;
-    inputDate.value=r.date;
+productName.value = r.name;
+price.value = r.price === 0 ? "" : r.price;
+quantity.value = r.qty === 1 ? "" : r.qty;
+weight.value = r.weight === 0 ? "" : r.weight;
+inputDate.value = r.date;
 
     $("btnSave").textContent="CẬP NHẬT";
 
