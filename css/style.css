@@ -400,3 +400,19 @@ tbody tr:active{
 .cell.money{
     text-align:right;
 }
+.dateTop{
+    width:125px !important;
+    margin:0 !important;
+    padding:10px 12px;
+    text-align:center;
+    font-size:15px;
+    font-weight:600;
+    color:#2563EB;
+}
+
+.topBar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
