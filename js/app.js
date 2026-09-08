@@ -420,7 +420,10 @@ function clearForm(){
     btnSave.textContent="ENTER";
 
     updateTotal();
-
+// Tự đưa con trỏ về ô Tên sản phẩm
+setTimeout(()=>{
+    productName.focus();
+},100);
 }
 
 //=======================
