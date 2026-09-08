@@ -28,13 +28,18 @@
 <!-- ================= TRANG NHẬP LIỆU ================= -->
 <main id="homePage" class="page hidden">
 
-  <header class="topBar">
-    <h1>Tiêu Dùng</h1>
+ <header class="topBar">
+
+    <input
+        id="inputDate"
+        type="date"
+        class="dateTop">
 
     <button id="btnSetting" class="iconBtn">
-      ⚙
+        ⚙
     </button>
-  </header>
+
+</header>
 
   <!-- Thống kê nhanh -->
   <section class="summary">
@@ -90,22 +95,18 @@
 
   </div>
 
-  <!-- Tổng tiền -->
-  <div class="totalBox">
-    <span>Tổng tiền</span>
-    <strong id="totalPrice">0</strong>
-  </div>
-
-  <!-- Ngày -->
-  <input
-    id="inputDate"
-    type="date">
-
+ 
   <!-- Enter -->
   <button id="btnSave" class="primary">
     ENTER
   </button>
 
+  <!-- Tổng tiền -->
+  <div class="totalBox">
+    <span>Tổng tiền</span>
+    <strong id="totalPrice">0</strong>
+  </div>
+  
   <!-- Công cụ -->
   <div class="toolRow">
 
