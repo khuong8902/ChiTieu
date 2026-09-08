@@ -1,141 +1,94 @@
-// =============================
-// Chi Tieu V2.1 Stable
-// Part 1/2
-// =============================
+/*=========================================
+  Chi Tieu V3.0
+  app.js  (Part 1/2)
+=========================================*/
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async ()=>{
 
-const $ = (id) => document.getElementById(id);
+const $ = id => document.getElementById(id);
 
-const today = () => new Date().toISOString().slice(0,10);
+const today = ()=> new Date().toISOString().slice(0,10);
 
-const format = (num)=>{
-    return Number(num || 0).toLocaleString("en-US");
-};
+const money = n => Number(n||0).toLocaleString("en-US");
 
-//=======================
-// Elements
-//=======================
-
-const splash = $("splash");
-
-const homePage = $("homePage");
-const statPage = $("statPage");
-
-const productName = $("productName");
-const price = $("price");
-const quantity = $("quantity");
-const weight = $("weight");
-const inputDate = $("inputDate");
-
-const suggestBox = $("suggestBox");
-
-const tableBody = $("tableBody");
-
-const totalPrice = $("totalPrice");
-
-const todayTotal = $("todayTotal");
-const monthTotal = $("monthTotal");
-
-const search = $("search");
-
-const btnSave = $("btnSave");
-
-//=======================
-// Local Storage
-//=======================
-
-let setting = JSON.parse(
-    localStorage.getItem("setting") ||
-    '{"currency":"JPY"}'
-);
-
-let nameList = JSON.parse(
-    localStorage.getItem("nameList") ||
-    "[]"
-);
-
-let expenseData = JSON.parse(
-    localStorage.getItem("expenseData") ||
-    "[]"
-);
+let setting = JSON.parse(localStorage.getItem("setting")||'{"currency":"JPY"}');
+let names   = JSON.parse(localStorage.getItem("nameList")||"[]");
+let rows    = JSON.parse(localStorage.getItem("expenseData")||"[]");
 
 let editIndex = -1;
+let chartMode = "month";
+let selectedDate = "";
 
-//=======================
-// Default Date
-//=======================
+/*=========================
+  Element
+=========================*/
+
+const productName = $("productName");
+const price       = $("price");
+const quantity    = $("quantity");
+const weight      = $("weight");
+const inputDate   = $("inputDate");
+
+const totalPrice  = $("totalPrice");
+const suggestBox  = $("suggestBox");
+const tableBody   = $("tableBody");
 
 inputDate.value = today();
 
-//=======================
-// Read NameList.txt
-//=======================
+/*=========================
+  Load NameList.txt
+=========================*/
 
 try{
 
     const txt = await fetch("NameList.txt").then(r=>r.text());
 
     txt.split(/\r?\n/)
-       .map(i=>i.trim())
+       .map(v=>v.trim())
        .filter(Boolean)
        .forEach(v=>{
 
-            if(!nameList.includes(v)){
-                nameList.push(v);
-            }
+            if(!names.includes(v))
+                names.push(v);
 
        });
 
-}catch(e){
-    console.log("Không đọc được NameList.txt");
-}
+}catch(e){}
 
-//=======================
-// Save Local
-//=======================
+/*=========================
+  Save
+=========================*/
 
 function saveDB(){
 
-    localStorage.setItem(
-        "setting",
-        JSON.stringify(setting)
-    );
-
-    localStorage.setItem(
-        "nameList",
-        JSON.stringify(nameList)
-    );
-
-    localStorage.setItem(
-        "expenseData",
-        JSON.stringify(expenseData)
-    );
+    localStorage.setItem("setting",JSON.stringify(setting));
+    localStorage.setItem("nameList",JSON.stringify(names));
+    localStorage.setItem("expenseData",JSON.stringify(rows));
 
 }
 
-//=======================
-// Normalize
-//=======================
+/*=========================
+  Normalize
+=========================*/
 
 function normalize(str){
 
-    return (str || "")
+    return (str||"")
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g,"");
 
 }
 
-//=======================
-// Suggest
-//=======================
+/*=========================
+  Suggest
+=========================*/
 
 function renderSuggest(){
 
     const key = normalize(productName.value);
 
-    suggestBox.innerHTML = "";
+    suggestBox.innerHTML="";
 
     if(key===""){
 
@@ -144,12 +97,12 @@ function renderSuggest(){
 
     }
 
-    const result = nameList
-        .filter(i=>normalize(i).includes(key))
+    const result = names
+        .filter(v=>normalize(v).includes(key))
         .sort((a,b)=>{
 
-            const ca = expenseData.filter(x=>x.name===a).length;
-            const cb = expenseData.filter(x=>x.name===b).length;
+            const ca = rows.filter(i=>i.name===a).length;
+            const cb = rows.filter(i=>i.name===b).length;
 
             return cb-ca;
 
@@ -167,7 +120,6 @@ function renderSuggest(){
         div.onclick=()=>{
 
             productName.value=v;
-
             suggestBox.style.display="none";
 
         };
@@ -176,26 +128,22 @@ function renderSuggest(){
 
     });
 
-    suggestBox.style.display =
-        result.length ? "block":"none";
+    suggestBox.style.display=result.length?"block":"none";
 
 }
 
-productName.addEventListener("input",renderSuggest);
+productName.oninput=renderSuggest;
 
-document.addEventListener("click",(e)=>{
+document.addEventListener("click",e=>{
 
-    if(!e.target.closest(".field")){
-
+    if(!e.target.closest(".fieldWrap"))
         suggestBox.style.display="none";
-
-    }
 
 });
 
-//=======================
-// Total Money
-//=======================
+/*=========================
+  Tổng tiền
+=========================*/
 
 function updateTotal(){
 
@@ -203,20 +151,17 @@ function updateTotal(){
 
     const q = Number(quantity.value)||1;
 
-    const total = p*q;
-
     totalPrice.textContent =
-        format(total)+" "+setting.currency;
+        money(p*q)+" "+setting.currency;
 
 }
 
 price.oninput=updateTotal;
-
 quantity.oninput=updateTotal;
 
-//=======================
-// Summary
-//=======================
+/*=========================
+  Summary
+=========================*/
 
 function renderSummary(){
 
@@ -225,139 +170,127 @@ function renderSummary(){
     const month = td.slice(0,7);
 
     let todayMoney=0;
-
     let monthMoney=0;
 
-    expenseData.forEach(i=>{
+    rows.forEach(r=>{
 
-        if(i.date===td){
+        if(r.date===td)
+            todayMoney+=r.total;
 
-            todayMoney+=i.total;
-
-        }
-
-        if(i.date.startsWith(month)){
-
-            monthMoney+=i.total;
-
-        }
+        if(r.date.startsWith(month))
+            monthMoney+=r.total;
 
     });
 
-    todayTotal.textContent =
-        format(todayMoney)+" "+setting.currency;
+    $("todayTotal").textContent=
+        money(todayMoney)+" "+setting.currency;
 
-    monthTotal.textContent =
-        format(monthMoney)+" "+setting.currency;
+    $("monthTotal").textContent=
+        money(monthMoney)+" "+setting.currency;
 
 }
 
-//=======================
-// Table
-//=======================
+/*=========================
+  Render Table
+=========================*/
 
 function renderTable(){
 
     tableBody.innerHTML="";
 
-    const key = normalize(search.value);
+    const key = normalize($("search").value);
 
-    expenseData
-        .filter(i=>normalize(i.name).includes(key))
-        .forEach((item,index)=>{
+    rows
+    .filter(r=>normalize(r.name).includes(key))
+    .forEach((item,index)=>{
 
         const tr=document.createElement("tr");
 
-tr.innerHTML=`
+        tr.innerHTML=`
 <td colspan="3" style="padding:0;border:none">
 
 <div class="swipeRow">
 
-    <div class="deleteBtn">
-        🗑 Xóa
-    </div>
+<div class="deleteBtn">
+🗑 Xóa
+</div>
 
-    <div class="rowContent">
+<div class="rowContent">
 
-        <div class="cell date">${item.date}</div>
+<div>${item.date}</div>
 
-        <div class="cell name">${item.name}</div>
+<div>${item.name}</div>
 
-        <div class="cell money">${format(item.total)}</div>
-
-    </div>
+<div class="money">
+${money(item.total)}
+</div>
 
 </div>
 
-</td>
-`;
+</div>
 
-        // Touch Delete
+</td>`;
 
-const rowContent = tr.querySelector(".rowContent");
-const deleteBtn = tr.querySelector(".deleteBtn");
+        const rowContent=tr.querySelector(".rowContent");
+        const deleteBtn=tr.querySelector(".deleteBtn");
 
-let startX = 0;
-let lastTap = 0;
-let opened = false;
+        let startX=0;
+        let lastTap=0;
+        let opened=false;
 
-tr.addEventListener("touchstart",(e)=>{
+        tr.addEventListener("touchstart",(e)=>{
 
-    startX = e.touches[0].clientX;
+            startX=e.touches[0].clientX;
 
-});
+        });
 
-tr.addEventListener("touchend",(e)=>{
+        tr.addEventListener("touchend",(e)=>{
 
-    const dx = e.changedTouches[0].clientX - startX;
+            const dx=e.changedTouches[0].clientX-startX;
 
-    // Vuốt trái mở nút Xóa
-    if(dx < -45){
+            if(dx<-45){
 
-        rowContent.style.transform = "translateX(-88px)";
-        opened = true;
-        return;
+                rowContent.style.transform="translateX(-88px)";
+                opened=true;
+                return;
 
-    }
+            }
 
-    // Vuốt phải đóng lại
-    if(dx > 45){
+            if(dx>45){
 
-        rowContent.style.transform = "translateX(0)";
-        opened = false;
-        return;
+                rowContent.style.transform="translateX(0)";
+                opened=false;
+                return;
 
-    }
+            }
 
-    // Nếu nút đỏ đang mở thì không sửa
-    if(opened) return;
+            if(opened) return;
 
-    const now = Date.now();
+            const now=Date.now();
 
-    if(now - lastTap < 300){
-        loadEdit(index);
-    }
+            if(now-lastTap<300){
 
-    lastTap = now;
+                loadEdit(index);
 
-});
+            }
 
-// Bấm nút đỏ để xóa
-deleteBtn.addEventListener("click",()=>{
+            lastTap=now;
 
-    expenseData.splice(index,1);
+        });
 
-    saveDB();
+        deleteBtn.onclick=()=>{
 
-    renderTable();
+            rows.splice(index,1);
 
-    renderSummary();
+            saveDB();
 
-    drawChart();
+            renderTable();
 
-});
+            renderSummary();
 
+            renderStatistic();
 
+        };
 
         tableBody.appendChild(tr);
 
@@ -365,74 +298,67 @@ deleteBtn.addEventListener("click",()=>{
 
 }
 
-//=======================
-// Edit
-//=======================
+/*=========================
+  Load Edit
+=========================*/
 
 function loadEdit(index){
 
-    const item = expenseData[index];
+    const r=rows[index];
 
     editIndex=index;
 
-    productName.value=item.name;
+    productName.value=r.name;
+    price.value=r.price;
+    quantity.value=r.qty||"";
+    weight.value=r.weight;
+    inputDate.value=r.date;
 
-    price.value=item.price;
-
-    quantity.value=item.qty===0?"":item.qty;
-
-    weight.value=item.weight;
-
-    inputDate.value=item.date;
-
-    btnSave.textContent="CẬP NHẬT";
+    $("btnSave").textContent="CẬP NHẬT";
 
     updateTotal();
 
     window.scrollTo({
-
         top:0,
-
         behavior:"smooth"
-
     });
 
 }
 
-//=======================
-// Clear
-//=======================
+/*=========================
+  Clear
+=========================*/
 
 function clearForm(){
 
-productName.value="";
-price.value="";
-quantity.value="";
-weight.value="";
-inputDate.value=today();
+    productName.value="";
+    price.value="";
+    quantity.value="";
+    weight.value="";
 
-editIndex=-1;
+    inputDate.value=today();
 
-btnSave.textContent="ENTER";
+    editIndex=-1;
 
-updateTotal();
+    $("btnSave").textContent="ENTER";
 
-// Tự đưa con trỏ về ô Tên sản phẩm
-setTimeout(()=>{
-    productName.focus();
-},100);
+    updateTotal();
+
+    setTimeout(()=>{
+        productName.focus();
+    },120);
+
 }
 
-//=======================
-// Save Button
-//=======================
+/*=========================
+  Save Data
+=========================*/
 
-btnSave.onclick=()=>{
+$("btnSave").onclick=()=>{
 
     if(productName.value.trim()===""){
 
         alert("Vui lòng nhập tên sản phẩm");
-
         return;
 
     }
@@ -455,17 +381,14 @@ btnSave.onclick=()=>{
 
     if(editIndex===-1){
 
-        expenseData.unshift(obj);
+        rows.unshift(obj);
 
-        if(!nameList.includes(obj.name)){
-
-            nameList.push(obj.name);
-
-        }
+        if(!names.includes(obj.name))
+            names.push(obj.name);
 
     }else{
 
-        expenseData[editIndex]=obj;
+        rows[editIndex]=obj;
 
     }
 
@@ -477,334 +400,335 @@ btnSave.onclick=()=>{
 
     renderSummary();
 
-    drawChart();
+    renderStatistic();
 
 };
 
-//=======================
-// Search
-//=======================
+$("search").oninput=renderTable;
+    /*=========================================
+  Chi Tieu V3.0
+  app.js (Part 2/2)
+=========================================*/
 
-search.oninput=renderTable;
-  //=======================
-// ===== PART 2/2 ======
-//=======================
+/*=========================
+  Statistic
+=========================*/
 
-// ---------- Setting ----------
+function renderStatistic(){
 
-const settingModal = $("settingModal");
-
-$("btnSetting").onclick = () => {
-    settingModal.classList.remove("hidden");
-};
-
-$("btnCloseSetting").onclick = () => {
-    settingModal.classList.add("hidden");
-};
-
-settingModal.onclick = (e) => {
-    if (e.target === settingModal) {
-        settingModal.classList.add("hidden");
-    }
-};
-
-document.querySelectorAll(".settingCurrency").forEach(btn => {
-
-    if(btn.dataset.value===setting.currency){
-        btn.classList.add("active");
-    }
-
-    btn.onclick = () => {
-
-        setting.currency = btn.dataset.value;
-
-        document
-            .querySelectorAll(".settingCurrency")
-            .forEach(i=>i.classList.remove("active"));
-
-        btn.classList.add("active");
-
-        saveDB();
-
-        updateTotal();
-
-        renderSummary();
-
-    };
-
-});
-
-//=======================
-// Statistic Page
-//=======================
-
-const monthPicker = $("monthPicker");
-const yearPicker = $("yearPicker");
-
-monthPicker.value = today().slice(0,7);
-
-// Tạo danh sách năm
-
-const currentYear = new Date().getFullYear();
-
-for(let y=currentYear-5;y<=currentYear+2;y++){
-
-    const op=document.createElement("option");
-
-    op.value=y;
-
-    op.textContent=y;
-
-    yearPicker.appendChild(op);
-
-}
-
-yearPicker.value=currentYear;
-
-//=======================
-// Tabs
-//=======================
-
-let chartMode="month";
-
-$("tabMonth").onclick=()=>{
-
-    chartMode="month";
-
-    $("monthPanel").classList.remove("hidden");
-    $("yearPanel").classList.add("hidden");
-
-    $("tabMonth").classList.add("active");
-    $("tabYear").classList.remove("active");
-
-    drawChart();
-
-};
-
-$("tabYear").onclick=()=>{
-
-    chartMode="year";
-
-    $("yearPanel").classList.remove("hidden");
-    $("monthPanel").classList.add("hidden");
-
-    $("tabYear").classList.add("active");
-    $("tabMonth").classList.remove("active");
-
-    drawChart();
-
-};
-
-monthPicker.onchange=drawChart;
-yearPicker.onchange=drawChart;
-
-//=======================
-// Line Chart
-//=======================
-
-function drawChart(){
-
-    const canvas = $("lineChart");
-
-    const ctx = canvas.getContext("2d");
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    // Grid
-
-    ctx.strokeStyle="#E5E7EB";
-
-    ctx.lineWidth=1;
-
-    for(let i=0;i<5;i++){
-
-        const y=20+i*45;
-
-        ctx.beginPath();
-
-        ctx.moveTo(30,y);
-
-        ctx.lineTo(330,y);
-
-        ctx.stroke();
-
-    }
-
-    let data=[];
+    const month = $("monthPicker").value || today().slice(0,7);
+    const year  = $("yearPicker").value || today().slice(0,4);
 
     if(chartMode==="month"){
 
-        data=new Array(31).fill(0);
-
-        expenseData.forEach(item=>{
-
-            if(item.date.startsWith(monthPicker.value)){
-
-                const d=Number(item.date.slice(8));
-
-                data[d-1]+=item.total;
-
-            }
-
-        });
+        renderMonthBars(month);
 
     }else{
 
-        data=new Array(12).fill(0);
-
-        expenseData.forEach(item=>{
-
-            if(item.date.startsWith(yearPicker.value)){
-
-                const m=Number(item.date.slice(5,7));
-
-                data[m-1]+=item.total;
-
-            }
-
-        });
+        renderYearBars(year);
 
     }
 
-    const max=Math.max(...data,1);
+}
 
-    // Line
+/*=========================
+  Month Bar
+=========================*/
 
-    ctx.strokeStyle="#2563EB";
-    ctx.lineWidth=3;
+function renderMonthBars(month){
 
-    ctx.beginPath();
+    const left = $("leftBars");
+    const right = $("rightBars");
 
-    data.forEach((v,i)=>{
+    left.innerHTML="";
+    right.innerHTML="";
 
-        const x=30+i*(300/(data.length-1));
+    let daily = Array(31).fill(0);
 
-        const y=190-(v/max)*150;
+    rows.forEach(r=>{
 
-        if(i===0){
+        if(r.date.startsWith(month)){
 
-            ctx.moveTo(x,y);
+            const d = Number(r.date.slice(8));
+            daily[d-1]+=r.total;
+
+        }
+
+    });
+
+    const max = Math.max(...daily,1);
+
+    daily.forEach((value,i)=>{
+
+        const day=i+1;
+
+        const bar=document.createElement("div");
+
+        bar.className="dayBar";
+
+        bar.dataset.date=`${month}-${String(day).padStart(2,"0")}`;
+
+        bar.innerHTML=`
+<div class="dayNo">${String(day).padStart(2,"0")}</div>
+
+<div class="barBg">
+<div class="barFill" style="width:${value/max*100}%"></div>
+</div>`;
+
+        bar.onclick=()=>showDayDetail(bar.dataset.date);
+
+        if(day<=15){
+
+            left.appendChild(bar);
 
         }else{
 
-            ctx.lineTo(x,y);
+            right.appendChild(bar);
 
         }
 
     });
 
-    ctx.stroke();
+    // Thống kê nhanh
 
-    // Points
+    const list = rows.filter(r=>r.date.startsWith(month));
 
-    ctx.fillStyle="#2563EB";
+    const total=list.reduce((s,i)=>s+i.total,0);
 
-    data.forEach((v,i)=>{
+    $("statTotal").textContent=
+        money(total)+" "+setting.currency;
 
-        const x=30+i*(300/(data.length-1));
+    $("statCount").textContent=list.length;
 
-        const y=190-(v/max)*150;
+    const days=Math.max(1,new Date(month+"-01").getDate());
 
-        ctx.beginPath();
-
-        ctx.arc(x,y,4,0,Math.PI*2);
-
-        ctx.fill();
-
-    });
-
-    // Labels
-
-    ctx.fillStyle="#64748B";
-
-    ctx.font="10px sans-serif";
-
-    if(chartMode==="month"){
-
-        for(let i=0;i<31;i+=5){
-
-            const x=30+i*(300/30);
-
-            ctx.fillText(i+1,x-5,210);
-
-        }
-
-    }else{
-
-        for(let i=0;i<12;i++){
-
-            const x=30+i*(300/11);
-
-            ctx.fillText(i+1,x-3,210);
-
-        }
-
-    }
+    $("statAvg").textContent=
+        money(Math.round(total/days));
 
 }
 
-//=======================
-// Page Switch
-//=======================
+/*=========================
+  Year Bar
+=========================*/
 
-$("btnStatistic").onclick=()=>{
+function renderYearBars(year){
 
-    homePage.classList.add("hidden");
+    const wrap=$("yearChart");
 
-    statPage.classList.remove("hidden");
+    wrap.innerHTML="";
 
-    drawChart();
+    let monthly=Array(12).fill(0);
 
-};
+    rows.forEach(r=>{
 
-$("btnBack").onclick=()=>{
+        if(r.date.startsWith(year)){
 
-    statPage.classList.add("hidden");
+            const m=Number(r.date.slice(5,7));
 
-    homePage.classList.remove("hidden");
+            monthly[m-1]+=r.total;
 
-};
+        }
 
-//=======================
-// Export Excel (.xlsx)
-//=======================
+    });
+
+    const max=Math.max(...monthly,1);
+
+    monthly.forEach((v,i)=>{
+
+        const row=document.createElement("div");
+
+        row.className="yearRow";
+
+        row.innerHTML=`
+<div>T${i+1}</div>
+
+<div class="barBg">
+<div class="barFill" style="width:${v/max*100}%"></div>
+</div>
+
+<div style="text-align:right">
+${money(v)}
+</div>`;
+
+        row.onclick=()=>{
+
+            chartMode="month";
+
+            $("tabMonth").classList.add("active");
+            $("tabYear").classList.remove("active");
+
+            $("monthPanel").classList.remove("hidden");
+            $("yearPanel").classList.add("hidden");
+
+            $("monthChart").classList.remove("hidden");
+            wrap.classList.add("hidden");
+
+            const mm=String(i+1).padStart(2,"0");
+
+            $("monthPicker").value=`${year}-${mm}`;
+
+            renderStatistic();
+
+        };
+
+        wrap.appendChild(row);
+
+    });
+
+    const list=rows.filter(r=>r.date.startsWith(year));
+
+    const total=list.reduce((s,i)=>s+i.total,0);
+
+    $("statTotal").textContent=
+        money(total)+" "+setting.currency;
+
+    $("statCount").textContent=list.length;
+
+    $("statAvg").textContent=
+        money(Math.round(total/12));
+
+}
+
+/*=========================
+  Detail
+=========================*/
+
+function showDayDetail(date){
+
+    selectedDate=date;
+
+    document.querySelectorAll(".dayBar")
+        .forEach(i=>i.classList.remove("active"));
+
+    const active=document.querySelector(`[data-date="${date}"]`);
+
+    if(active) active.classList.add("active");
+
+    const list=rows.filter(r=>r.date===date);
+
+    const map={};
+
+    list.forEach(r=>{
+
+        if(!map[r.name]){
+
+            map[r.name]={
+                name:r.name,
+                qty:0,
+                weight:0,
+                total:0
+            };
+
+        }
+
+        map[r.name].qty+=r.qty;
+        map[r.name].weight+=r.weight;
+        map[r.name].total+=r.total;
+
+    });
+
+    const result=Object.values(map)
+        .sort((a,b)=>b.total-a.total);
+
+    const total=result.reduce((s,i)=>s+i.total,0);
+
+    $("detailPanel").classList.remove("hidden");
+
+    $("detailDate").textContent=date;
+
+    $("detailTotal").textContent=
+        money(total)+" "+setting.currency;
+
+    $("detailInfo").textContent=
+        `${list.length} lượt mua • ${result.length} sản phẩm`;
+
+    const wrap=$("detailList");
+
+    wrap.innerHTML="";
+
+    result.forEach((item,index)=>{
+
+        const medal=["🥇","🥈","🥉"][index]||"🏅";
+
+        const percent=Math.round(item.total/total*100);
+
+        const div=document.createElement("div");
+
+        div.className="detailItem";
+
+        div.innerHTML=`
+<div class="rank">${medal}</div>
+
+<div class="info">
+
+<div class="name">${item.name}</div>
+
+<div class="sub">
+SL: ${item.qty} · ${item.weight} g
+</div>
+
+<div class="percentBar">
+<div class="percentFill" style="width:${percent}%"></div>
+</div>
+
+</div>
+
+<div class="price">
+
+${money(item.total)}
+
+<div class="sub">${percent}%</div>
+
+</div>`;
+
+        wrap.appendChild(div);
+
+    });
+
+}
+
+/*=========================
+  Excel V3
+=========================*/
 
 $("btnExcel").onclick=()=>{
 
-    const excelData=expenseData.map(i=>({
+    const data=rows.map(r=>({
 
-        "Ngày nhập":i.date,
-
-        "Tên sản phẩm":i.name,
-
-        "Giá":i.price,
-
-        "Số lượng":i.qty,
-
-        "Tổng tiền":i.total,
-
-        "Trọng lượng (g)":i.weight,
-
+        "Ngày nhập":r.date,
+        "Tên sản phẩm":r.name,
+        "Giá":r.price,
+        "Số lượng":r.qty,
+        "Tổng tiền":r.total,
+        "Trọng lượng(g)":r.weight,
         "Tiền tệ":setting.currency
 
     }));
 
+    const total=rows.reduce((s,i)=>s+i.total,0);
+
+    data.push({
+        "Ngày nhập":"",
+        "Tên sản phẩm":"TỔNG",
+        "Giá":"",
+        "Số lượng":"",
+        "Tổng tiền":total,
+        "Trọng lượng(g)":"",
+        "Tiền tệ":setting.currency
+    });
+
     const wb=XLSX.utils.book_new();
 
-    const ws=XLSX.utils.json_to_sheet(excelData);
-
-    // Độ rộng cột
+    const ws=XLSX.utils.json_to_sheet(data);
 
     ws["!cols"]=[
-
-        {wch:14},
-        {wch:24},
-        {wch:12},
+        {wch:13},
+        {wch:22},
+        {wch:10},
         {wch:10},
         {wch:14},
-        {wch:16},
+        {wch:15},
         {wch:10}
-
     ];
 
     XLSX.utils.book_append_sheet(
@@ -820,9 +744,136 @@ $("btnExcel").onclick=()=>{
 
 };
 
-//=======================
-// START APP
-//=======================
+/*=========================
+  Page
+=========================*/
+
+$("btnStatistic").onclick=()=>{
+
+    $("homePage").classList.add("hidden");
+    $("statPage").classList.remove("hidden");
+
+    renderStatistic();
+
+};
+
+$("btnBack").onclick=()=>{
+
+    $("statPage").classList.add("hidden");
+    $("homePage").classList.remove("hidden");
+
+};
+
+/*=========================
+  Tab
+=========================*/
+
+$("tabMonth").onclick=()=>{
+
+    chartMode="month";
+
+    $("tabMonth").classList.add("active");
+    $("tabYear").classList.remove("active");
+
+    $("monthPanel").classList.remove("hidden");
+    $("yearPanel").classList.add("hidden");
+
+    $("monthChart").classList.remove("hidden");
+    $("yearChart").classList.add("hidden");
+
+    renderStatistic();
+
+};
+
+$("tabYear").onclick=()=>{
+
+    chartMode="year";
+
+    $("tabYear").classList.add("active");
+    $("tabMonth").classList.remove("active");
+
+    $("monthPanel").classList.add("hidden");
+    $("yearPanel").classList.remove("hidden");
+
+    $("monthChart").classList.add("hidden");
+    $("yearChart").classList.remove("hidden");
+
+    renderStatistic();
+
+};
+
+$("monthPicker").value=today().slice(0,7);
+
+const nowYear=new Date().getFullYear();
+
+for(let y=nowYear-5;y<=nowYear+2;y++){
+
+    const op=document.createElement("option");
+
+    op.value=y;
+
+    op.textContent=y;
+
+    $("yearPicker").appendChild(op);
+
+}
+
+$("yearPicker").value=nowYear;
+
+$("monthPicker").onchange=renderStatistic;
+$("yearPicker").onchange=renderStatistic;
+
+/*=========================
+  Setting
+=========================*/
+
+$("btnSetting").onclick=()=>{
+
+    $("settingModal").classList.remove("hidden");
+
+};
+
+$("btnCloseSetting").onclick=()=>{
+
+    $("settingModal").classList.add("hidden");
+
+};
+
+$("settingModal").onclick=e=>{
+
+    if(e.target.id==="settingModal")
+        $("settingModal").classList.add("hidden");
+
+};
+
+document.querySelectorAll(".settingCurrency")
+.forEach(btn=>{
+
+    if(btn.dataset.value===setting.currency)
+        btn.classList.add("active");
+
+    btn.onclick=()=>{
+
+        setting.currency=btn.dataset.value;
+
+        document.querySelectorAll(".settingCurrency")
+            .forEach(i=>i.classList.remove("active"));
+
+        btn.classList.add("active");
+
+        saveDB();
+
+        updateTotal();
+        renderSummary();
+        renderStatistic();
+
+    };
+
+});
+
+/*=========================
+  Start
+=========================*/
 
 updateTotal();
 
@@ -830,14 +881,12 @@ renderTable();
 
 renderSummary();
 
-drawChart();
+renderStatistic();
 
 setTimeout(()=>{
 
-    splash.style.display="none";
+    $("splash").style.display="none";
 
-    homePage.classList.remove("hidden");
-
-},600);
+},500);
 
 });
