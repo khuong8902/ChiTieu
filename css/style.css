@@ -54,7 +54,7 @@ body{
 .page{
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:8px;
 }
 
 /* ---------- Header ---------- */
@@ -207,10 +207,10 @@ select{
     font-weight:700;
 }
 
-.toolRow{
+.toolGrid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:10px;
+    gap:8px;
 }
 
 .toolBtn{
@@ -222,7 +222,17 @@ select{
     font-weight:600;
     box-shadow:0 1px 3px #0001;
 }
+.backupBtn{
+    background:#DBEAFE;
+    color:#1D4ED8;
+    font-weight:700;
+}
 
+.restoreBtn{
+    background:#D1FAE5;
+    color:#166534;
+    font-weight:700;
+}
 /* ---------- Total ---------- */
 
 .totalBox{
@@ -519,4 +529,45 @@ td{
 
 #btnCloseSetting{
     background:#E5E7EB;
+}
+/*=========================
+  Toast
+=========================*/
+
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:34px;
+    transform:translateX(-50%);
+    z-index:9999;
+    animation:fadeIn .25s;
+}
+
+.toastBox{
+    background:#ECFDF5;
+    color:#166534;
+    border:1px solid #BBF7D0;
+    border-radius:999px;
+    padding:10px 16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:14px;
+    font-weight:600;
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+
+.toastIcon{
+    font-size:18px;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
 }
