@@ -66,7 +66,28 @@ function saveDB(){
     localStorage.setItem("expenseData",JSON.stringify(rows));
 
 }
+/*=========================
+  Toast
+=========================*/
 
+function showToast(text){
+
+    const toast = $("toast");
+    const label = $("toastText");
+
+    label.textContent = text;
+
+    toast.classList.remove("hidden");
+
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer = setTimeout(()=>{
+
+        toast.classList.add("hidden");
+
+    },1800);
+
+}
 /*=========================
   Normalize
 =========================*/
@@ -870,7 +891,105 @@ document.querySelectorAll(".settingCurrency")
     };
 
 });
+/*=========================
+  Backup
+=========================*/
 
+$("btnBackup").onclick = ()=>{
+
+    const backup = {
+
+        version : "3.1",
+
+        backupDate : new Date().toISOString(),
+
+        setting : setting,
+
+        nameList : names,
+
+        expenseData : rows
+
+    };
+
+    const blob = new Blob(
+
+        [JSON.stringify(backup,null,2)],
+
+        {type:"application/json"}
+
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+
+    a.download = "ChiTieu_Backup.json";
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+    showToast("Đã sao lưu vào bộ máy");
+
+};
+ /*=========================
+  Restore
+=========================*/
+
+$("btnRestore").onclick = ()=>{
+
+    $("restoreFile").click();
+
+};
+
+$("restoreFile").onchange = async(e)=>{
+
+    const file = e.target.files[0];
+
+    if(!file) return;
+
+    try{
+
+        const text = await file.text();
+
+        const data = JSON.parse(text);
+
+        if(!data.expenseData){
+
+            alert("File sao lưu không hợp lệ");
+            return;
+
+        }
+
+        rows = data.expenseData || [];
+
+        names = data.nameList || [];
+
+        setting = data.setting || setting;
+
+        saveDB();
+
+        renderTable();
+
+        renderSummary();
+
+        renderStatistic();
+
+        updateTotal();
+
+        showToast("Khôi phục thành công");
+
+    }catch(err){
+
+        alert("Không đọc được file sao lưu");
+
+    }
+
+    e.target.value="";
+
+}; 
 /*=========================
   Start
 =========================*/
