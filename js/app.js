@@ -829,9 +829,11 @@ $("monthPicker").value=today().slice(0,7);
   Year Picker
 =========================*/
 
-const currentYear = new Date().getFullYear();
+const nowYear = new Date().getFullYear();
 
-for(let y = 2000; y <= 2100; y++){
+$("yearPicker").innerHTML = "";
+
+for (let y = 2000; y <= 2100; y++) {
 
     const op = document.createElement("option");
 
@@ -839,17 +841,9 @@ for(let y = 2000; y <= 2100; y++){
     op.textContent = y;
 
     $("yearPicker").appendChild(op);
-
 }
 
-// mặc định chọn năm hiện tại
-$("yearPicker").value = currentYear;
-
-$("yearPicker").value=nowYear;
-
-$("monthPicker").onchange=renderStatistic;
-$("yearPicker").onchange=renderStatistic;
-
+$("yearPicker").value = String(nowYear);
 /*=========================
   Setting
 =========================*/
