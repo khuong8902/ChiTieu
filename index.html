@@ -12,7 +12,6 @@
 
   <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
 <!-- Splash -->
@@ -21,21 +20,17 @@
   <div class="splashText">Chi Tiêu</div>
 </div>
 
-<!-- ================= TRANG NHẬP LIỆU ================= -->
+<!-- ================= HOME ================= -->
 <div id="homePage" class="page">
 
   <!-- Header -->
   <div class="topBar">
     <input id="inputDate" type="date" class="dateTop">
-
-    <button id="btnSetting" class="iconBtn">
-      ⚙
-    </button>
+    <button id="btnSetting" class="iconBtn">⚙</button>
   </div>
 
-  <!-- Tổng -->
+  <!-- Summary -->
   <div class="summaryGrid">
-
     <div class="summaryCard">
       <div class="summaryTitle">Hôm nay</div>
       <div id="todayTotal" class="summaryValue">0</div>
@@ -45,294 +40,176 @@
       <div class="summaryTitle">Tháng này</div>
       <div id="monthTotal" class="summaryValue">0</div>
     </div>
-
   </div>
 
-  <!-- Tên -->
+  <!-- Product -->
   <div class="fieldWrap">
-
-    <input
-      id="productName"
-      type="text"
-      placeholder="Tên sản phẩm"
-      autocomplete="off">
-
+    <input id="productName" type="text" placeholder="Tên sản phẩm" autocomplete="off">
     <div id="suggestBox" class="suggestBox"></div>
-
   </div>
 
-  <!-- Giá -->
-  <input
-    id="price"
-    type="number"
-    placeholder="Giá">
+  <!-- Price -->
+  <input id="price" type="number" placeholder="Giá">
 
-  <!-- SL -->
-  <input
-    id="quantity"
-    type="number"
-    placeholder="Số lượng">
+  <!-- Quantity -->
+  <input id="quantity" type="number" placeholder="Số lượng">
 
-  <!-- Trọng lượng -->
+  <!-- Weight -->
   <div class="weightRow">
-
-    <input
-      id="weight"
-      type="number"
-      placeholder="Trọng lượng">
-
+    <input id="weight" type="number" placeholder="Trọng lượng">
     <div class="unitBox">g</div>
-
   </div>
 
-  <!-- Enter -->
-  <button id="btnSave" class="enterBtn">
-    ENTER
-  </button>
+  <!-- ENTER -->
+  <button id="btnSave" class="enterBtn">ENTER</button>
 
-  <!-- Tổng tiền -->
+  <!-- Total -->
   <div class="totalBox">
-
     <span>Tổng tiền</span>
-
     <strong id="totalPrice">0 JPY</strong>
-
   </div>
 
-  <!-- Công cụ -->
+  <!-- Tools -->
   <div class="toolGrid">
+    <button id="btnExcel" class="toolBtn">📄 Xuất Excel</button>
+    <button id="btnStatistic" class="toolBtn">📊 Thống kê</button>
+    <button id="btnBackup" class="toolBtn backupBtn">💾 Sao lưu</button>
+    <button id="btnRestore" class="toolBtn restoreBtn">📂 Khôi phục</button>
+  </div>
 
-  <button id="btnExcel" class="toolBtn">
-    📄 Xuất Excel
-  </button>
-
-  <button id="btnStatistic" class="toolBtn">
-    📊 Thống kê
-  </button>
-
-  <button id="btnBackup" class="toolBtn backupBtn">
-    💾 Sao lưu
-  </button>
-
-  <button id="btnRestore" class="toolBtn restoreBtn">
-    📂 Khôi phục
-  </button>
-
-</div>
-
-<!-- Input ẩn để chọn file khôi phục -->
-<input
-  id="restoreFile"
-  type="file"
-  accept=".json"
-  hidden>
+  <input id="restoreFile" type="file" accept=".json" hidden>
 
   <!-- Search -->
-  <input
-    id="search"
-    type="text"
-    placeholder="Tìm sản phẩm...">
+  <input id="search" type="text" placeholder="Tìm sản phẩm...">
 
-  <!-- Danh sách -->
+  <!-- List -->
   <div class="listArea">
-
     <table>
-
       <thead>
-
         <tr>
-
           <th style="width:34%">Ngày</th>
-
           <th>Tên</th>
-
           <th style="width:24%">Tiền</th>
-
         </tr>
-
       </thead>
-
       <tbody id="tableBody"></tbody>
-
     </table>
-
   </div>
 
 </div>
 
-<!-- ================= THỐNG KÊ ================= -->
+<!-- ================= STATISTIC ================= -->
 <div id="statPage" class="page hidden">
 
-  <!-- Header -->
   <div class="topBar">
-
-    <button id="btnBack" class="iconBtn">
-      ←
-    </button>
-
-    <div class="pageTitle">
-      Thống kê
-    </div>
-
+    <button id="btnBack" class="iconBtn">←</button>
+    <div class="pageTitle">Thống kê</div>
     <div style="width:42px"></div>
-
   </div>
 
-  <!-- 3 ô thống kê -->
   <div class="statGrid">
-
     <div class="statCard">
-
       <div class="statLabel">Tổng chi</div>
-
-      <div id="statTotal" class="statValue red">
-        0
-      </div>
-
+      <div id="statTotal" class="statValue red">0</div>
     </div>
 
     <div class="statCard">
-
       <div class="statLabel">Lượt mua</div>
-
-      <div id="statCount" class="statValue blue">
-        0
-      </div>
-
+      <div id="statCount" class="statValue blue">0</div>
     </div>
 
     <div class="statCard">
-
       <div class="statLabel">TB/ngày</div>
-
-      <div id="statAvg" class="statValue green">
-        0
-      </div>
-
+      <div id="statAvg" class="statValue green">0</div>
     </div>
-
   </div>
 
-  <!-- Theo tháng -->
+  <!-- Month Picker -->
   <div id="monthPanel" class="pickerBar">
-
     <span>Tháng</span>
-
     <input id="monthPicker" type="month">
-
   </div>
 
-  <!-- Theo năm -->
+  <!-- iOS Wheel Picker -->
   <div id="yearPanel" class="pickerBar hidden">
-
     <span>Năm</span>
-
-     <div class="wheelPicker" id="yearWheel"></div>
-
+    <div class="wheelContainer">
+      <div id="yearWheel" class="wheelPicker"></div>
+    </div>
   </div>
 
-  <!-- Biểu đồ tháng -->
+  <!-- Charts -->
   <div id="monthChart" class="monthChart">
-
     <div id="leftBars" class="barColumn"></div>
-
     <div id="rightBars" class="barColumn"></div>
-
   </div>
 
-  <!-- Biểu đồ năm -->
   <div id="yearChart" class="yearChart hidden"></div>
 
-  <!-- Chi tiết -->
+  <!-- Detail -->
   <div id="detailPanel" class="detailPanel hidden">
-
     <div class="detailHeader">
-
       <div>
-
-        <div id="detailDate" class="detailDate">
-          18/09/2026
-        </div>
-
-        <div id="detailInfo" class="detailInfo">
-          4 lượt mua • 3 sản phẩm
-        </div>
-
+        <div id="detailDate" class="detailDate">18/09/2026</div>
+        <div id="detailInfo" class="detailInfo">4 lượt mua • 3 sản phẩm</div>
       </div>
-
-      <div id="detailTotal" class="detailMoney">
-        ¥0
-      </div>
-
+      <div id="detailTotal" class="detailMoney">¥0</div>
     </div>
 
-    <div id="detailList" class="detailList">
-
-      <!-- JS render -->
-
-    </div>
-
+    <div id="detailList" class="detailList"></div>
   </div>
 
   <!-- Bottom -->
   <div class="bottomTabs">
-
-    <button
-      id="tabMonth"
-      class="tab active">
-      Theo tháng
-    </button>
-
-    <button
-      id="tabYear"
-      class="tab">
-      Theo năm
-    </button>
-
+    <button id="tabMonth" class="tab active">Theo tháng</button>
+    <button id="tabYear" class="tab">Theo năm</button>
   </div>
 
 </div>
 
-<!-- ================= CÀI ĐẶT ================= -->
+<!-- ================= SETTING ================= -->
 <div id="settingModal" class="modal hidden">
 
-  <div class="dialog">
+  <div class="dialog settingDialog">
 
-    <h3>Cài đặt tiền tệ</h3>
+    <h3>⚙ Cài đặt</h3>
 
-    <button
-      class="settingCurrency"
-      data-value="JPY">
-      JPY
-    </button>
+    <div class="settingGroup">
+      <div class="settingLabel">Tiền tệ</div>
+      <div class="currencyRow">
+        <button class="settingCurrency" data-value="JPY">JPY</button>
+        <button class="settingCurrency" data-value="VND">VND</button>
+      </div>
+    </div>
 
-    <button
-      class="settingCurrency"
-      data-value="VND">
-      VND
-    </button>
+    <hr>
 
-    <button id="btnCloseSetting">
-      Đóng
-    </button>
+    <div class="settingGroup">
+      <div class="settingLabel">Phiên bản</div>
+      <div class="versionText">Chi Tiêu V3.2 Stable</div>
+      <small>Build 2026.09.10</small>
+    </div>
+
+    <hr>
+
+    <div class="settingGroup">
+      <div class="settingLabel">Backup gần nhất</div>
+      <div id="lastBackup">Chưa sao lưu</div>
+    </div>
+
+    <button id="btnCloseSetting" class="closeBtn">Đóng</button>
 
   </div>
-
 </div>
+
 <!-- Toast -->
 <div id="toast" class="toast hidden">
-
   <div class="toastBox">
-
     <span class="toastIcon">✅</span>
-
-    <span id="toastText">
-      Đã sao lưu vào bộ nhớ máy
-    </span>
-
+    <span id="toastText">Đã sao lưu vào bộ máy</span>
   </div>
-
 </div>
+
 <script src="lib/xlsx.full.min.js"></script>
 <script src="js/app.js"></script>
 
