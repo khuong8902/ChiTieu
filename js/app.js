@@ -1,5 +1,5 @@
 /*=========================================
-  Chi Tieu V3.0
+  Chi Tieu V3.1
   app.js  (Part 1/2)
 =========================================*/
 
@@ -825,19 +825,25 @@ $("tabYear").onclick=()=>{
 
 $("monthPicker").value=today().slice(0,7);
 
-const nowYear=new Date().getFullYear();
+/*=========================
+  Year Picker
+=========================*/
 
-for(let y=nowYear-5;y<=nowYear+2;y++){
+const currentYear = new Date().getFullYear();
 
-    const op=document.createElement("option");
+for(let y = 2000; y <= 2100; y++){
 
-    op.value=y;
+    const op = document.createElement("option");
 
-    op.textContent=y;
+    op.value = y;
+    op.textContent = y;
 
     $("yearPicker").appendChild(op);
 
 }
+
+// mặc định chọn năm hiện tại
+$("yearPicker").value = currentYear;
 
 $("yearPicker").value=nowYear;
 
