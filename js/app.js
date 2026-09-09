@@ -18,6 +18,7 @@ let rows    = JSON.parse(localStorage.getItem("expenseData")||"[]");
 let editIndex = -1;
 let chartMode = "month";
 let selectedDate = "";
+let currentYear = new Date().getFullYear();
 
 /*=========================
   Element
@@ -438,7 +439,7 @@ $("search").oninput=renderTable;
 function renderStatistic(){
 
     const month = $("monthPicker").value || today().slice(0,7);
-    const year  = $("yearPicker").value || today().slice(0,4);
+    const year = String(currentYear);
 
     if(chartMode==="month"){
 
@@ -826,26 +827,109 @@ $("tabYear").onclick=()=>{
 $("monthPicker").value=today().slice(0,7);
 
 /*=========================
-  Year Picker
+  Year Wheel
 =========================*/
 
-$("yearPicker").innerHTML = "";
+const yearWheel = $("yearWheel");
 
-for (let y = 2000; y <= 2100; y++) {
+let currentYear = new Date().getFullYear();
 
-    const op = document.createElement("option");
+function buildYearWheel(){
 
-    op.value = y;
-    op.textContent = y;
+    yearWheel.innerHTML="";
 
-    $("yearPicker").appendChild(op);
+    for(let y=2000;y<=2100;y++){
+
+        const div=document.createElement("div");
+
+        div.className="wheelItem";
+
+        div.dataset.year=y;
+
+        div.textContent=y;
+
+        yearWheel.appendChild(div);
+
+    }
+
+    setTimeout(()=>{
+
+        scrollToYear(currentYear,false);
+
+    },50);
 
 }
 
-$("yearPicker").value = String(new Date().getFullYear());
-  
-$("monthPicker").onchange = renderStatistic;
-$("yearPicker").onchange = renderStatistic;
+function scrollToYear(year,smooth=true){
+
+    currentYear=year;
+
+    const item=yearWheel.querySelector(`[data-year="${year}"]`);
+
+    if(!item) return;
+
+    item.scrollIntoView({
+        block:"center",
+        behavior:smooth?"smooth":"auto"
+    });
+
+    updateWheelActive();
+
+    renderStatistic();
+
+}
+
+function updateWheelActive(){
+
+    const center=yearWheel.scrollTop+70;
+
+    let best=null;
+    let diff=9999;
+
+    yearWheel.querySelectorAll(".wheelItem").forEach(el=>{
+
+        const d=Math.abs(el.offsetTop-center);
+
+        if(d<diff){
+
+            diff=d;
+            best=el;
+
+        }
+
+        el.classList.remove("active");
+
+    });
+
+    if(best){
+
+        best.classList.add("active");
+
+        currentYear=Number(best.dataset.year);
+
+    }
+
+}
+
+let wheelTimer=null;
+
+yearWheel.addEventListener("scroll",()=>{
+
+    updateWheelActive();
+
+    clearTimeout(wheelTimer);
+
+    wheelTimer=setTimeout(()=>{
+
+        renderStatistic();
+
+    },120);
+
+});
+
+$("monthPicker").onchange=renderStatistic;
+
+buildYearWheel();
 /*=========================
   Setting
 =========================*/
