@@ -829,8 +829,6 @@ $("monthPicker").value=today().slice(0,7);
   Year Picker
 =========================*/
 
-const nowYear = new Date().getFullYear();
-
 $("yearPicker").innerHTML = "";
 
 for (let y = 2000; y <= 2100; y++) {
@@ -841,9 +839,13 @@ for (let y = 2000; y <= 2100; y++) {
     op.textContent = y;
 
     $("yearPicker").appendChild(op);
+
 }
 
-$("yearPicker").value = String(nowYear);
+$("yearPicker").value = String(new Date().getFullYear());
+  
+$("monthPicker").onchange = renderStatistic;
+$("yearPicker").onchange = renderStatistic;
 /*=========================
   Setting
 =========================*/
