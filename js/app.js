@@ -998,7 +998,8 @@ $("tabYear").onclick = ()=>{
 
     requestAnimationFrame(()=>{
 
-        setWheelYear(new Date().getFullYear());
+        // Giữ nguyên năm đang xem
+        setWheelYear(currentYear);
 
         renderStatistic();
 
