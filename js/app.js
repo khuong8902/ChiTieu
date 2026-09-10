@@ -1036,7 +1036,11 @@ $("tabYear").onclick=()=>{
     $("monthChart").classList.add("hidden");
     $("yearChart").classList.remove("hidden");
 
-    renderStatistic();
+    // Khi panel đã hiện mới cuộn tới đúng năm
+    requestAnimationFrame(()=>{
+        scrollToYear(currentYear,false);
+        renderStatistic();
+    });
 
 };
 
