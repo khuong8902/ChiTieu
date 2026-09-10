@@ -988,6 +988,11 @@ $("btnStatistic").onclick=()=>{
     $("homePage").classList.add("hidden");
     $("statPage").classList.remove("hidden");
 
+    // Luôn trở về năm hiện tại khi mở thống kê
+    currentYear = new Date().getFullYear();
+
+    scrollToYear(currentYear,false);
+
     renderStatistic();
 
 };
