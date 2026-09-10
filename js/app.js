@@ -463,11 +463,6 @@ function buildYearWheel(){
 
     }
 
-    setTimeout(()=>{
-
-        scrollToYear(currentYear,false);
-
-    },50);
 
 }
 
@@ -490,21 +485,18 @@ function scrollToYear(year, smooth = true){
 
 function updateWheelActive(){
 
-    const center=yearWheel.scrollTop+70;
+    const center = yearWheel.scrollTop + 70;
 
-    let best=null;
-    let diff=9999;
+    let best = null;
+    let diff = Infinity;
 
-    yearWheel.querySelectorAll(".wheelItem")
-    .forEach(el=>{
+    yearWheel.querySelectorAll(".wheelItem").forEach(el=>{
 
-        const d=Math.abs(el.offsetTop-center);
+        const d = Math.abs(el.offsetTop - center);
 
-        if(d<diff){
-
-            diff=d;
-            best=el;
-
+        if(d < diff){
+            diff = d;
+            best = el;
         }
 
         el.classList.remove("active");
@@ -512,11 +504,8 @@ function updateWheelActive(){
     });
 
     if(best){
-
         best.classList.add("active");
-
-        currentYear=Number(best.dataset.year);
-
+        currentYear = Number(best.dataset.year);
     }
 
 }
@@ -1033,10 +1022,12 @@ $("tabYear").onclick=()=>{
     $("monthChart").classList.add("hidden");
     $("yearChart").classList.remove("hidden");
 
-    // Khi panel đã hiện mới cuộn tới đúng năm
     requestAnimationFrame(()=>{
+
         scrollToYear(currentYear,false);
+
         renderStatistic();
+
     });
 
 };
@@ -1089,24 +1080,23 @@ document.querySelectorAll(".settingCurrency")
    START
 ========================= */
 
-buildYearWheel();
-currentYear = new Date().getFullYear();
-  
-updateTotal();
+function buildYearWheel(){
 
-renderTable();
+    yearWheel.innerHTML = "";
 
-renderSummary();
+    for(let y=2000;y<=2100;y++){
 
-renderStatistic();
+        const div=document.createElement("div");
 
-$("lastBackup").textContent=
-    setting.lastBackup||"Chưa sao lưu";
+        div.className="wheelItem";
 
-setTimeout(()=>{
+        div.dataset.year=y;
 
-    $("splash").style.display="none";
+        div.textContent=y;
 
-},450);
+        yearWheel.appendChild(div);
 
-});
+    }
+
+    // KHÔNG gọi updateWheelActive ở đây nữa
+}
