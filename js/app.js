@@ -471,23 +471,20 @@ function buildYearWheel(){
 
 }
 
-function scrollToYear(year,smooth=true){
+function scrollToYear(year, smooth = true){
 
-    currentYear=year;
-    sessionYear = year;
+    currentYear = Number(year);
 
-    const item=yearWheel.querySelector(
-        `[data-year="${year}"]`
-    );
+    const top = (currentYear - 2000) * 36;
 
-    if(!item) return;
-
-    item.scrollIntoView({
-        block:"center",
-        behavior:smooth?"smooth":"auto"
+    yearWheel.scrollTo({
+        top: top,
+        behavior: smooth ? "smooth" : "auto"
     });
 
-    updateWheelActive();
+    setTimeout(() => {
+        updateWheelActive();
+    }, smooth ? 180 : 0);
 
 }
 
@@ -1093,8 +1090,7 @@ document.querySelectorAll(".settingCurrency")
 ========================= */
 
 buildYearWheel();
-sessionYear = new Date().getFullYear();
-currentYear = sessionYear;
+currentYear = new Date().getFullYear();
   
 updateTotal();
 
