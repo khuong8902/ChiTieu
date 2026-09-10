@@ -1,20 +1,19 @@
 /*=========================================
-  Chi Tiêu V3.2 Stable
-  app.js  (Part 1/2)
+  Chi Tieu V3.2 Stable
+  app.js (Part 1/3)
 =========================================*/
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async ()=>{
 
 const $ = id => document.getElementById(id);
 
-const today = () => new Date().toISOString().slice(0,10);
+const today = ()=> new Date().toISOString().slice(0,10);
 
-const formatMoney = n =>
-    Number(n||0).toLocaleString("en-US");
+const money = n => Number(n||0).toLocaleString("en-US");
 
-/*=========================
-  DATABASE
-=========================*/
+/* =========================
+   DATABASE
+========================= */
 
 let setting = JSON.parse(
     localStorage.getItem("setting") ||
@@ -34,9 +33,9 @@ let chartMode = "month";
 let currentYear = new Date().getFullYear();
 let selectedDate = "";
 
-/*=========================
-  ELEMENT
-=========================*/
+/* =========================
+   ELEMENT
+========================= */
 
 const productName = $("productName");
 const price = $("price");
@@ -50,26 +49,29 @@ const tableBody = $("tableBody");
 
 inputDate.value = today();
 
-/*=========================
-  LOAD NAMELIST
-=========================*/
+/* =========================
+   LOAD NAMELIST.TXT
+========================= */
 
 try{
 
     const txt = await fetch("NameList.txt").then(r=>r.text());
 
     txt.split(/\r?\n/)
-       .map(v=>v.trim())
-       .filter(Boolean)
-       .forEach(v=>{
-            if(!names.includes(v)) names.push(v);
-       });
+        .map(v=>v.trim())
+        .filter(Boolean)
+        .forEach(v=>{
+
+            if(!names.includes(v))
+                names.push(v);
+
+        });
 
 }catch(e){}
 
-/*=========================
-  SAVE
-=========================*/
+/* =========================
+   SAVE DATABASE
+========================= */
 
 function saveDB(){
 
@@ -79,9 +81,9 @@ function saveDB(){
 
 }
 
-/*=========================
-  TOAST
-=========================*/
+/* =========================
+   TOAST
+========================= */
 
 function showToast(text){
 
@@ -99,9 +101,9 @@ function showToast(text){
 
 }
 
-/*=========================
-  NORMALIZE
-=========================*/
+/* =========================
+   NORMALIZE
+========================= */
 
 function normalize(str){
 
@@ -112,9 +114,9 @@ function normalize(str){
 
 }
 
-/*=========================
-  SUGGEST
-=========================*/
+/* =========================
+   SUGGEST
+========================= */
 
 function renderSuggest(){
 
@@ -164,7 +166,7 @@ function renderSuggest(){
 
 }
 
-productName.oninput = renderSuggest;
+productName.oninput=renderSuggest;
 
 document.addEventListener("click",e=>{
 
@@ -173,9 +175,9 @@ document.addEventListener("click",e=>{
 
 });
 
-/*=========================
-  TOTAL
-=========================*/
+/* =========================
+   TOTAL
+========================= */
 
 function updateTotal(){
 
@@ -183,55 +185,55 @@ function updateTotal(){
     const q = Number(quantity.value)||1;
 
     totalPrice.textContent =
-        formatMoney(p*q)+" "+setting.currency;
+        money(p*q)+" "+setting.currency;
 
 }
 
-price.oninput = updateTotal;
-quantity.oninput = updateTotal;
+price.oninput=updateTotal;
+quantity.oninput=updateTotal;
 
-/*=========================
-  SUMMARY
-=========================*/
+/* =========================
+   SUMMARY
+========================= */
 
 function renderSummary(){
 
     const td = today();
     const month = td.slice(0,7);
 
-    let todayMoney = 0;
-    let monthMoney = 0;
+    let todayMoney=0;
+    let monthMoney=0;
 
     rows.forEach(r=>{
 
         if(r.date===td)
-            todayMoney += r.total;
+            todayMoney+=r.total;
 
         if(r.date.startsWith(month))
-            monthMoney += r.total;
+            monthMoney+=r.total;
 
     });
 
-    $("todayTotal").textContent =
-        formatMoney(todayMoney)+" "+setting.currency;
+    $("todayTotal").textContent=
+        money(todayMoney)+" "+setting.currency;
 
-    $("monthTotal").textContent =
-        formatMoney(monthMoney)+" "+setting.currency;
+    $("monthTotal").textContent=
+        money(monthMoney)+" "+setting.currency;
 
 }
 
-/*=========================
-  TABLE
-=========================*/
+/* =========================
+   TABLE
+========================= */
 
 function renderTable(){
 
     tableBody.innerHTML="";
 
-    const keyword = normalize($("search").value);
+    const key = normalize($("search").value);
 
     rows
-    .filter(r=>normalize(r.name).includes(keyword))
+    .filter(r=>normalize(r.name).includes(key))
     .forEach((item,index)=>{
 
         const tr=document.createElement("tr");
@@ -241,17 +243,17 @@ function renderTable(){
 
 <div class="swipeRow">
 
-    <div class="deleteBtn">🗑 Xóa</div>
+<div class="deleteBtn">🗑 Xóa</div>
 
-    <div class="rowContent">
+<div class="rowContent">
 
-        <div>${item.date}</div>
+<div>${item.date}</div>
 
-        <div>${item.name}</div>
+<div>${item.name}</div>
 
-        <div class="money">${formatMoney(item.total)}</div>
+<div class="money">${money(item.total)}</div>
 
-    </div>
+</div>
 
 </div>
 
@@ -264,13 +266,13 @@ function renderTable(){
         let lastTap=0;
         let opened=false;
 
-        tr.addEventListener("touchstart",e=>{
+        tr.addEventListener("touchstart",(e)=>{
 
             startX=e.touches[0].clientX;
 
         });
 
-        tr.addEventListener("touchend",e=>{
+        tr.addEventListener("touchend",(e)=>{
 
             const dx=e.changedTouches[0].clientX-startX;
 
@@ -321,25 +323,25 @@ function renderTable(){
 
 }
 
-/*=========================
-  LOAD EDIT
-=========================*/
+/* =========================
+   LOAD EDIT
+========================= */
 
 function loadEdit(index){
 
-    const r = rows[index];
+    const r=rows[index];
 
-    editIndex = index;
+    editIndex=index;
 
-    productName.value = r.name;
+    productName.value=r.name;
 
-    price.value = r.price===0 ? "" : r.price;
+    price.value=r.price===0?"":r.price;
 
-    quantity.value = r.qty===1 ? "" : r.qty;
+    quantity.value=r.qty===1?"":r.qty;
 
-    weight.value = r.weight===0 ? "" : r.weight;
+    weight.value=r.weight===0?"":r.weight;
 
-    inputDate.value = r.date;
+    inputDate.value=r.date;
 
     $("btnSave").textContent="CẬP NHẬT";
 
@@ -352,9 +354,9 @@ function loadEdit(index){
 
 }
 
-/*=========================
-  CLEAR FORM
-=========================*/
+/* =========================
+   CLEAR FORM
+========================= */
 
 function clearForm(){
 
@@ -373,9 +375,9 @@ function clearForm(){
 
 }
 
-/*=========================
-  SAVE ITEM
-=========================*/
+/* =========================
+   SAVE ITEM
+========================= */
 
 $("btnSave").onclick=()=>{
 
@@ -425,29 +427,34 @@ $("btnSave").onclick=()=>{
 };
 
 $("search").oninput=renderTable;
-/*=========================
-  YEAR WHEEL
-=========================*/
+
+/* ====== PART 2 nối tiếp ngay dưới ====== */
+/* =========================
+   YEAR WHEEL (iPhone)
+========================= */
 
 const yearWheel = $("yearWheel");
 let wheelReady = false;
 
 function buildYearWheel(){
 
-    yearWheel.innerHTML = "";
+    yearWheel.innerHTML="";
 
     for(let y=2000;y<=2100;y++){
 
         const div=document.createElement("div");
+
         div.className="wheelItem";
+
         div.dataset.year=y;
+
         div.textContent=y;
 
         yearWheel.appendChild(div);
 
     }
 
-    wheelReady = true;
+    wheelReady=true;
 
 }
 
@@ -455,25 +462,24 @@ function setWheelYear(year){
 
     if(!wheelReady) return;
 
-    currentYear = Number(year);
+    currentYear=Number(year);
 
-    const top = (currentYear-2000)*36;
+    const top=(currentYear-2000)*36;
 
-    yearWheel.scrollTop = top;
+    yearWheel.scrollTop=top;
 
-    updateWheelActive();
+    updateWheel();
 
 }
 
-function updateWheelActive(){
+function updateWheel(){
 
-    const center = yearWheel.scrollTop + 80;
+    const center=yearWheel.scrollTop+80;
 
-    let best = null;
-    let diff = Infinity;
+    let best=null;
+    let diff=9999;
 
-    yearWheel.querySelectorAll(".wheelItem")
-    .forEach(el=>{
+    yearWheel.querySelectorAll(".wheelItem").forEach(el=>{
 
         const d=Math.abs(el.offsetTop-center);
 
@@ -502,7 +508,7 @@ let wheelTimer;
 
 yearWheel.addEventListener("scroll",()=>{
 
-    updateWheelActive();
+    updateWheel();
 
     clearTimeout(wheelTimer);
 
@@ -515,9 +521,9 @@ yearWheel.addEventListener("scroll",()=>{
 
 });
 
-/*=========================
-  STATISTIC
-=========================*/
+/* =========================
+   STATISTIC
+========================= */
 
 $("monthPicker").value=today().slice(0,7);
 
@@ -537,9 +543,9 @@ function renderStatistic(){
 
 }
 
-/*=========================
-  MONTH BAR
-=========================*/
+/* =========================
+   MONTH BAR
+========================= */
 
 function renderMonthBars(month){
 
@@ -549,7 +555,7 @@ function renderMonthBars(month){
     left.innerHTML="";
     right.innerHTML="";
 
-    let daily=Array(31).fill(0);
+    const daily=Array(31).fill(0);
 
     rows.forEach(r=>{
 
@@ -586,8 +592,10 @@ style="width:${value/max*100}%"></div>
 
         bar.onclick=()=>showDayDetail(bar.dataset.date);
 
-        if(day<=15) left.appendChild(bar);
-        else right.appendChild(bar);
+        if(day<=15)
+            left.appendChild(bar);
+        else
+            right.appendChild(bar);
 
     });
 
@@ -596,7 +604,7 @@ style="width:${value/max*100}%"></div>
     const total=list.reduce((s,i)=>s+i.total,0);
 
     $("statTotal").textContent=
-        formatMoney(total)+" "+setting.currency;
+        money(total)+" "+setting.currency;
 
     $("statCount").textContent=list.length;
 
@@ -607,13 +615,13 @@ style="width:${value/max*100}%"></div>
     ).getDate();
 
     $("statAvg").textContent=
-        formatMoney(Math.round(total/Math.max(days,1)));
+        money(Math.round(total/Math.max(days,1)));
 
 }
 
-/*=========================
-  YEAR BAR
-=========================*/
+/* =========================
+   YEAR BAR
+========================= */
 
 function renderYearBars(year){
 
@@ -621,7 +629,7 @@ function renderYearBars(year){
 
     wrap.innerHTML="";
 
-    let monthly=Array(12).fill(0);
+    const monthly=Array(12).fill(0);
 
     rows.forEach(r=>{
 
@@ -637,18 +645,18 @@ function renderYearBars(year){
 
     const max=Math.max(...monthly,1);
 
-    monthly.forEach((v,i)=>{
+    monthly.forEach((value,index)=>{
 
         const row=document.createElement("div");
 
         row.className="dayBar";
 
         row.innerHTML=`
-<div class="dayNo">T${i+1}</div>
+<div class="dayNo">T${index+1}</div>
 
 <div class="barBg">
 <div class="barFill"
-style="width:${v/max*100}%"></div>
+style="width:${value/max*100}%"></div>
 </div>`;
 
         row.onclick=()=>{
@@ -665,7 +673,7 @@ style="width:${v/max*100}%"></div>
             wrap.classList.add("hidden");
 
             $("monthPicker").value=
-                `${year}-${String(i+1).padStart(2,"0")}`;
+                `${year}-${String(index+1).padStart(2,"0")}`;
 
             renderStatistic();
 
@@ -680,18 +688,18 @@ style="width:${v/max*100}%"></div>
     const total=list.reduce((s,i)=>s+i.total,0);
 
     $("statTotal").textContent=
-        formatMoney(total)+" "+setting.currency;
+        money(total)+" "+setting.currency;
 
     $("statCount").textContent=list.length;
 
     $("statAvg").textContent=
-        formatMoney(Math.round(total/12));
+        money(Math.round(total/12));
 
 }
 
-/*=========================
-  DAY DETAIL
-=========================*/
+/* =========================
+   DETAIL PANEL
+========================= */
 
 function showDayDetail(date){
 
@@ -733,7 +741,7 @@ function showDayDetail(date){
         `${list.length} lượt mua • ${result.length} sản phẩm`;
 
     $("detailTotal").textContent=
-        formatMoney(total)+" "+setting.currency;
+        money(total)+" "+setting.currency;
 
     const wrap=$("detailList");
 
@@ -743,7 +751,9 @@ function showDayDetail(date){
 
         const medal=["🥇","🥈","🥉"][index]||"🏅";
 
-        const percent=Math.round(item.total/Math.max(total,1)*100);
+        const percent=Math.round(
+            item.total/Math.max(total,1)*100
+        );
 
         const div=document.createElement("div");
 
@@ -769,7 +779,7 @@ style="width:${percent}%"></div>
 
 <div class="price">
 
-${formatMoney(item.total)}
+${money(item.total)}
 
 <div class="sub">${percent}%</div>
 
@@ -781,91 +791,88 @@ ${formatMoney(item.total)}
 
 }
 
-/*=========================
-  BACKUP
-=========================*/
+/* ====== PART 3 nối tiếp ngay dưới ====== */
+/* =========================
+   BACKUP
+========================= */
 
-$("btnBackup").onclick=()=>{
+$("btnBackup").onclick = ()=>{
 
-    const backup={
+    const backup = {
 
-        version:"3.2",
-
-        backupDate:new Date().toISOString(),
+        version : "3.2",
+        backupDate : new Date().toISOString(),
 
         setting,
-        nameList:names,
-        expenseData:rows
+        nameList : names,
+        expenseData : rows
 
     };
 
-    const blob=new Blob(
+    const blob = new Blob(
         [JSON.stringify(backup,null,2)],
         {type:"application/json"}
     );
 
-    const url=URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
 
-    const a=document.createElement("a");
+    const a = document.createElement("a");
 
-    a.href=url;
-
-    a.download="ChiTieu_Backup.json";
-
+    a.href = url;
+    a.download = "ChiTieu_Backup.json";
     a.click();
 
     URL.revokeObjectURL(url);
 
-    setting.lastBackup=
-        new Date().toLocaleString("vi-VN");
+    setting.lastBackup = new Date().toLocaleString("vi-VN");
 
     saveDB();
 
-    $("lastBackup").textContent=
-        setting.lastBackup;
+    $("lastBackup").textContent = setting.lastBackup;
 
     showToast("Đã sao lưu vào bộ máy");
 
 };
 
-/*=========================
-  RESTORE
-=========================*/
+/* =========================
+   RESTORE
+========================= */
 
-$("btnRestore").onclick=()=>{
+$("btnRestore").onclick = ()=>{
 
     $("restoreFile").click();
 
 };
 
-$("restoreFile").onchange=async(e)=>{
+$("restoreFile").onchange = async(e)=>{
 
-    const file=e.target.files[0];
+    const file = e.target.files[0];
 
     if(!file) return;
 
     try{
 
-        const text=await file.text();
+        const text = await file.text();
 
-        const data=JSON.parse(text);
+        const data = JSON.parse(text);
 
-        rows=data.expenseData||[];
-        names=data.nameList||[];
-        setting=data.setting||setting;
+        rows = data.expenseData || [];
+        names = data.nameList || [];
+        setting = data.setting || setting;
 
         saveDB();
 
         renderTable();
         renderSummary();
         renderStatistic();
+        updateTotal();
 
-        $("lastBackup").textContent=
-            setting.lastBackup||"Chưa sao lưu";
+        $("lastBackup").textContent =
+            setting.lastBackup || "Chưa sao lưu";
 
         showToast("Khôi phục thành công");
 
-    }catch{
+    }catch(err){
 
         alert("File Backup không hợp lệ");
 
@@ -875,49 +882,65 @@ $("restoreFile").onchange=async(e)=>{
 
 };
 
-/*=========================
-  EXCEL
-=========================*/
+/* =========================
+   EXPORT EXCEL
+========================= */
 
-$("btnExcel").onclick=()=>{
+$("btnExcel").onclick = ()=>{
 
-    const data=rows.map(r=>({
+    const data = rows.map(r=>({
 
-        "Ngày nhập":r.date,
-        "Tên sản phẩm":r.name,
-        "Giá":r.price,
-        "Số lượng":r.qty,
-        "Tổng tiền":r.total,
-        "Trọng lượng(g)":r.weight,
-        "Tiền tệ":setting.currency
+        "Ngày nhập"      : r.date,
+        "Tên sản phẩm"   : r.name,
+        "Giá"            : r.price,
+        "Số lượng"       : r.qty,
+        "Tổng tiền"      : r.total,
+        "Trọng lượng(g)" : r.weight,
+        "Tiền tệ"        : setting.currency
 
     }));
 
-    const wb=XLSX.utils.book_new();
+    data.push({
 
-    const ws=XLSX.utils.json_to_sheet(data);
+        "Ngày nhập":"",
+        "Tên sản phẩm":"TỔNG",
+        "Giá":"",
+        "Số lượng":"",
+        "Tổng tiền": rows.reduce((s,i)=>s+i.total,0),
+        "Trọng lượng(g)":"",
+        "Tiền tệ":setting.currency
 
-    XLSX.utils.book_append_sheet(
-        wb,ws,"ChiTieu"
-    );
+    });
 
-    XLSX.writeFile(
-        wb,
-        "DuLieuChiTieu.xlsx"
-    );
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(data);
+
+    ws["!cols"] = [
+        {wch:13},
+        {wch:22},
+        {wch:10},
+        {wch:10},
+        {wch:14},
+        {wch:15},
+        {wch:10}
+    ];
+
+    XLSX.utils.book_append_sheet(wb,ws,"ChiTieu");
+
+    XLSX.writeFile(wb,"DuLieuChiTieu.xlsx");
 
 };
 
-/*=========================
-  PAGE
-=========================*/
+/* =========================
+   PAGE
+========================= */
 
-$("btnStatistic").onclick=()=>{
+$("btnStatistic").onclick = ()=>{
 
     $("homePage").classList.add("hidden");
     $("statPage").classList.remove("hidden");
 
-    chartMode="month";
+    chartMode = "month";
 
     $("tabMonth").classList.add("active");
     $("tabYear").classList.remove("active");
@@ -932,14 +955,18 @@ $("btnStatistic").onclick=()=>{
 
 };
 
-$("btnBack").onclick=()=>{
+$("btnBack").onclick = ()=>{
 
     $("statPage").classList.add("hidden");
     $("homePage").classList.remove("hidden");
 
 };
 
-$("tabMonth").onclick=()=>{
+/* =========================
+   TAB
+========================= */
+
+$("tabMonth").onclick = ()=>{
 
     chartMode="month";
 
@@ -956,7 +983,7 @@ $("tabMonth").onclick=()=>{
 
 };
 
-$("tabYear").onclick=()=>{
+$("tabYear").onclick = ()=>{
 
     chartMode="year";
 
@@ -979,20 +1006,20 @@ $("tabYear").onclick=()=>{
 
 };
 
-/*=========================
-  SETTING
-=========================*/
+/* =========================
+   SETTING
+========================= */
 
-$("btnSetting").onclick=()=>{
+$("btnSetting").onclick = ()=>{
 
     $("settingModal").classList.remove("hidden");
 
-    $("lastBackup").textContent=
-        setting.lastBackup||"Chưa sao lưu";
+    $("lastBackup").textContent =
+        setting.lastBackup || "Chưa sao lưu";
 
 };
 
-$("btnCloseSetting").onclick=()=>{
+$("btnCloseSetting").onclick = ()=>{
 
     $("settingModal").classList.add("hidden");
 
@@ -1004,9 +1031,9 @@ document.querySelectorAll(".settingCurrency")
     if(btn.dataset.value===setting.currency)
         btn.classList.add("active");
 
-    btn.onclick=()=>{
+    btn.onclick = ()=>{
 
-        setting.currency=btn.dataset.value;
+        setting.currency = btn.dataset.value;
 
         document.querySelectorAll(".settingCurrency")
         .forEach(i=>i.classList.remove("active"));
@@ -1023,9 +1050,9 @@ document.querySelectorAll(".settingCurrency")
 
 });
 
-/*=========================
-  START
-=========================*/
+/* =========================
+   START
+========================= */
 
 buildYearWheel();
 
@@ -1033,8 +1060,8 @@ renderTable();
 renderSummary();
 updateTotal();
 
-$("lastBackup").textContent=
-    setting.lastBackup||"Chưa sao lưu";
+$("lastBackup").textContent =
+    setting.lastBackup || "Chưa sao lưu";
 
 setTimeout(()=>{
 
@@ -1042,4 +1069,4 @@ setTimeout(()=>{
 
 },350);
 
-});
+}); // Kết thúc DOMContentLoaded
