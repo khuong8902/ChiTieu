@@ -1,5 +1,6 @@
 /* =====================================
-   Chi Tieu V3.2 Stable
+   Chi Tiêu V3.2 Stable
+   style.css
 ===================================== */
 
 *{
@@ -22,7 +23,7 @@ body{
     display:none!important;
 }
 
-/* ---------- Splash ---------- */
+/* Splash */
 
 .splash{
     position:fixed;
@@ -48,7 +49,7 @@ body{
     color:#2563EB;
 }
 
-/* ---------- Layout ---------- */
+/* Layout */
 
 .page{
     display:flex;
@@ -89,7 +90,7 @@ body{
     box-shadow:0 1px 3px rgba(0,0,0,.08);
 }
 
-/* ---------- Summary ---------- */
+/* Summary */
 
 .summaryGrid{
     display:grid;
@@ -116,7 +117,7 @@ body{
     color:#2563EB;
 }
 
-/* ---------- Input ---------- */
+/* Input */
 
 .fieldWrap{
     position:relative;
@@ -148,7 +149,7 @@ input{
     border-radius:14px;
 }
 
-/* ---------- Suggest ---------- */
+/* Suggest */
 
 .suggestBox{
     position:absolute;
@@ -168,7 +169,7 @@ input{
     border-bottom:1px solid #F1F5F9;
 }
 
-/* ---------- Enter ---------- */
+/* Enter */
 
 .enterBtn{
     border:none;
@@ -180,7 +181,7 @@ input{
     font-weight:700;
 }
 
-/* ---------- Total ---------- */
+/* Total */
 
 .totalBox{
     background:#DBEAFE;
@@ -196,7 +197,7 @@ input{
     font-size:18px;
 }
 
-/* ---------- Tools ---------- */
+/* Tool */
 
 .toolGrid{
     display:grid;
@@ -223,7 +224,7 @@ input{
     color:#166534;
 }
 
-/* ---------- Table ---------- */
+/* Table */
 
 .listArea{
     background:#FFF;
@@ -292,7 +293,7 @@ td{
     font-weight:700;
 }
 
-/* ---------- Statistic ---------- */
+/* Statistic */
 
 .statGrid{
     display:grid;
@@ -337,11 +338,12 @@ td{
     font-weight:600;
 }
 
-/* ===== iPhone Wheel Picker ===== */
+/* iPhone Wheel Picker */
 
 .wheelContainer{
     display:flex;
     justify-content:center;
+    position:relative;
 }
 
 .wheelPicker{
@@ -385,12 +387,6 @@ td{
     font-weight:700;
 }
 
-/* vùng chọn giữa */
-
-.wheelContainer{
-    position:relative;
-}
-
 .wheelContainer::after{
     content:"";
     position:absolute;
@@ -404,7 +400,7 @@ td{
     border-radius:8px;
 }
 
-/* ---------- Month chart ---------- */
+/* Month chart */
 
 .monthChart{
     display:grid;
@@ -448,7 +444,7 @@ td{
     outline:2px solid #FCA5A5;
 }
 
-/* ---------- Year chart ---------- */
+/* Year chart */
 
 .yearChart{
     background:#FFF;
@@ -459,7 +455,7 @@ td{
     gap:8px;
 }
 
-/* ---------- Detail ---------- */
+/* Detail */
 
 .detailPanel{
     background:#FFF;
@@ -534,7 +530,7 @@ td{
     border-radius:999px;
 }
 
-/* ---------- Bottom Tabs ---------- */
+/* Bottom */
 
 .bottomTabs{
     display:grid;
@@ -556,7 +552,7 @@ td{
     color:#FFF;
 }
 
-/* ---------- Modal ---------- */
+/* Modal */
 
 .modal{
     position:fixed;
@@ -625,7 +621,7 @@ td{
     font-weight:700;
 }
 
-/* ---------- Toast ---------- */
+/* Toast */
 
 .toast{
     position:fixed;
