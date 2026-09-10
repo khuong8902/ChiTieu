@@ -32,7 +32,8 @@ let editIndex = -1;
 let chartMode = "month";
 let selectedDate = "";
 let currentYear = new Date().getFullYear();
-
+// Ghi nhớ năm trong 1 lần mở app
+let sessionYear = currentYear;
 /* =========================
    ELEMENT
 ========================= */
@@ -473,6 +474,7 @@ function buildYearWheel(){
 function scrollToYear(year,smooth=true){
 
     currentYear=year;
+    sessionYear = year;
 
     const item=yearWheel.querySelector(
         `[data-year="${year}"]`
@@ -988,8 +990,8 @@ $("btnStatistic").onclick=()=>{
     $("homePage").classList.add("hidden");
     $("statPage").classList.remove("hidden");
 
-    // Luôn trở về năm hiện tại khi mở thống kê
-    currentYear = new Date().getFullYear();
+    // Chỉ lần đầu trong phiên mới đưa về năm hiện tại
+    currentYear = sessionYear;
 
     scrollToYear(currentYear,false);
 
@@ -1087,7 +1089,9 @@ document.querySelectorAll(".settingCurrency")
 ========================= */
 
 buildYearWheel();
-
+sessionYear = new Date().getFullYear();
+currentYear = sessionYear;
+  
 updateTotal();
 
 renderTable();
